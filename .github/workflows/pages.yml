@@ -2,7 +2,11 @@ name: Publicar no GitHub Pages
 
 on:
   push:
-    branches: [main]
+    # branch padrao atual do repositorio; 'main' fica previsto caso
+    # o projeto seja promovido para ela mais adiante
+    branches:
+      - claude/tqs-moment-calculator-s3qlnv
+      - main
   workflow_dispatch:
 
 permissions:
