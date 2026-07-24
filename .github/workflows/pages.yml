@@ -27,7 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # enablement liga o GitHub Pages na primeira execucao, sem precisar
+      # mexer em Settings -> Pages
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Reunir os arquivos do site (a ferramenta e estatica, sem build)
         run: |
