@@ -12,7 +12,13 @@ Ferramenta livre, sem dependência de software comercial e **sem nenhuma bibliot
 Abra o arquivo `index.html` no navegador — duplo clique basta, não precisa de servidor,
 instalação ou conexão com a internet.
 
-Para publicar em rede (ex.: GitHub Pages), basta servir a pasta como conteúdo estático.
+### Publicar na web
+
+O repositório já traz o fluxo de publicação em **GitHub Pages**
+(`.github/workflows/pages.yml`): a cada push na branch `main` o site é publicado.
+Só é preciso habilitar uma vez, em *Settings → Pages → Build and deployment*,
+escolhendo a origem **GitHub Actions**. O endereço fica
+`https://0bibs.github.io/Flex-o-Simples/`.
 
 ## O que a ferramenta faz
 
@@ -93,10 +99,16 @@ Testes automatizados (sem dependências, com o `node:test` nativo):
 node --test
 ```
 
-Cobrem o caso de referência, os parâmetros normativos dos dois grupos de concreto, a
-reprodução da Tabela 17.3, ida-e-volta `Msd → As → MRd` nos domínios 2 e 3, armadura dupla,
-seção T com a linha neutra na mesa e na alma, armadura mínima governando e o diagrama do
-aço tipo B.
+São 22 testes em dois arquivos, executados a cada push pelo
+`.github/workflows/testes.yml`:
+
+- `test/flexao.test.js` — o caso de referência, os parâmetros normativos dos dois grupos de
+  concreto, a reprodução da Tabela 17.3, ida-e-volta `Msd → As → MRd` nos domínios 2 e 3,
+  armadura dupla, o aviso de ductilidade quando a dupla está desativada, seção T com a linha
+  neutra na mesa e na alma, armadura mínima governando e o diagrama do aço tipo B.
+- `test/pagina.test.js` — consistência entre `index.html` e `js/app.js` (todo id usado
+  existe), ordem de carga dos scripts, ausência de qualquer recurso externo e geração dos
+  dois SVG sem `NaN` para seção retangular, T, armadura dupla e momento nulo.
 
 ## Estrutura
 
@@ -108,7 +120,9 @@ js/flexao.js               núcleo de cálculo
 js/desenho-equilibrio.js   desenho do equilíbrio da seção
 js/desenho-dominios.js     desenho dos domínios de deformação
 js/app.js                  ligação da interface com o cálculo
-test/flexao.test.js        testes
+test/flexao.test.js        testes do cálculo
+test/pagina.test.js        testes de consistência da página e dos desenhos
+.github/workflows/         testes automáticos e publicação no GitHub Pages
 ```
 
 Os arquivos de `js/` funcionam tanto no navegador quanto no Node, sem transpilação.
