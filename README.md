@@ -14,20 +14,16 @@ instalação ou conexão com a internet.
 
 ### Publicar na web
 
-O repositório já traz o fluxo de publicação em **GitHub Pages**
-(`.github/workflows/pages.yml`): a cada push na branch padrão o site vai para
-`https://0bibs.github.io/Flex-o-Simples/`.
+A ferramenta está publicada em **https://0bibs.github.io/Flex-o-Simples/**.
 
-Falta **um passo manual, feito uma única vez** — o `GITHUB_TOKEN` do workflow não
-tem permissão para criar o site sozinho (`Resource not accessible by
-integration`):
+O fluxo `.github/workflows/pages.yml` republica o site a cada push na branch
+padrão — não há build, os arquivos vão direto.
 
-1. abra *Settings → Pages* no repositório;
-2. em *Build and deployment → Source*, escolha **GitHub Actions**.
-
-Depois disso, é só refazer a última execução em *Actions → Publicar no GitHub
-Pages → Re-run jobs*, ou dar qualquer novo push: as publicações seguintes são
-automáticas.
+> Ao clonar este repositório para outra conta, o Pages precisa ser ligado uma vez
+> em *Settings → Pages → Build and deployment → Source: **GitHub Actions***. O
+> `GITHUB_TOKEN` do workflow não consegue fazer isso sozinho: a criação do site
+> exige permissão de administrador do repositório e retorna
+> `Resource not accessible by integration`.
 
 ## O que a ferramenta faz
 
