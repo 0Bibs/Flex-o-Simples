@@ -19,6 +19,22 @@ A ferramenta está publicada em **https://0bibs.github.io/Flex-o-Simples/**.
 O fluxo `.github/workflows/pages.yml` republica o site a cada push na branch
 padrão — não há build, os arquivos vão direto.
 
+### Instalar como aplicativo
+
+O site é uma **PWA**: abra o endereço acima no Chrome ou no Edge e use
+*Instalar* (o ícone na barra de endereço, ou o menu ⋮ → *Instalar Flexo
+Simples*). No celular, *Adicionar à tela de início*.
+
+Instalada, a ferramenta ganha janela própria, ícone no menu iniciar e
+**funciona sem internet** — o `sw.js` guarda os 58 KB da aplicação em cache na
+primeira visita. Nada é enviado para servidor nenhum: todo o cálculo acontece
+na sua máquina.
+
+A estratégia de cache é *stale-while-revalidate*: abre instantaneamente com a
+versão guardada e busca a atualização em segundo plano, que passa a valer no
+carregamento seguinte. Ao mudar os arquivos, incremente `CACHE` em `sw.js`
+para forçar a limpeza do cache antigo.
+
 > Ao clonar este repositório para outra conta, o Pages precisa ser ligado uma vez
 > em *Settings → Pages → Build and deployment → Source: **GitHub Actions***. O
 > `GITHUB_TOKEN` do workflow não consegue fazer isso sozinho: a criação do site
@@ -104,7 +120,7 @@ Testes automatizados (sem dependências, com o `node:test` nativo):
 node --test
 ```
 
-São 22 testes em dois arquivos, executados a cada push pelo
+São 27 testes em dois arquivos, executados a cada push pelo
 `.github/workflows/testes.yml`:
 
 - `test/flexao.test.js` — o caso de referência, os parâmetros normativos dos dois grupos de
@@ -113,12 +129,17 @@ São 22 testes em dois arquivos, executados a cada push pelo
   neutra na mesa e na alma, armadura mínima governando e o diagrama do aço tipo B.
 - `test/pagina.test.js` — consistência entre `index.html` e `js/app.js` (todo id usado
   existe), ordem de carga dos scripts, ausência de qualquer recurso externo e geração dos
-  dois SVG sem `NaN` para seção retangular, T, armadura dupla e momento nulo.
+  dois SVG sem `NaN` para seção retangular, T, armadura dupla e momento nulo. Cobre também
+  a PWA: campos obrigatórios do manifesto, dimensão real dos PNG conferida contra o
+  declarado, e a lista de cache do `sw.js` em sincronia com o que a página realmente usa.
 
 ## Estrutura
 
 ```
 index.html                 interface
+manifest.json              identidade da PWA (nome, cores, ícones)
+sw.js                      service worker: cache offline e instalação
+icons/                     ícones da aplicação instalada
 css/styles.css             estilo
 js/norma.js                parâmetros normativos e conversões
 js/flexao.js               núcleo de cálculo

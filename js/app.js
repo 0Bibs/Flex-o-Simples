@@ -229,7 +229,23 @@
     $('btVerificar').addEventListener('click', verificar);
   }
 
+  /* ------------------------------------------------ instalacao offline
+     Registra o service worker, que guarda a ferramenta em cache e permite
+     instala-la como aplicativo. So faz sentido sob http/https: aberta por
+     duplo clique (file://) a pagina ja funciona sem rede, e o navegador
+     nem permite service worker. */
+  function registrarServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {
+        /* sem cache offline; a ferramenta continua funcionando normalmente */
+      });
+    });
+  }
+
   preencherBitolas();
   ligar();
   dimensionar();
+  registrarServiceWorker();
 })();
