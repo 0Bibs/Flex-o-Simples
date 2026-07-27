@@ -284,17 +284,31 @@ test('o icone .ico e valido e tem varios tamanhos', () => {
 
 test('o script do atalho aponta para arquivos que existem', () => {
   const ps1 = fs.readFileSync(path.join(raiz, 'atalho/criar-atalho.ps1'), 'utf8');
-  const cmd = fs.readFileSync(path.join(raiz, 'atalho/Criar atalho (Windows).cmd'), 'utf8');
-  /* o .cmd precisa de CRLF para o interpretador do Windows */
-  assert.ok(cmd.includes('\r\n'), 'o .cmd deve usar quebra de linha CRLF');
-  assert.match(cmd, /criar-atalho\.ps1/);
-  /* caminhos citados no script existem no repositorio */
-  assert.match(ps1, /icons\\flexo-simples\.ico/);
-  assert.ok(fs.existsSync(path.join(raiz, 'icons/flexo-simples.ico')));
+  const cmds = ['Criar atalho (Windows).cmd', 'Criar atalho corporativo (Windows).cmd']
+    .map((n) => ({ nome: n, txt: fs.readFileSync(path.join(raiz, 'atalho', n), 'utf8') }));
+
+  for (const { nome, txt } of cmds) {
+    /* o .cmd precisa de CRLF para o interpretador do Windows */
+    assert.ok(txt.includes('\r\n'), nome + ' deve usar quebra de linha CRLF');
+    assert.match(txt, /criar-atalho\.ps1/);
+  }
+  /* o .cmd corporativo passa o tema adiante */
+  assert.match(cmds[1].txt, /-Tema corporativo/);
+
+  /* todo .ico citado no script existe mesmo */
+  const icones = [...ps1.matchAll(/'([\w-]+\.ico)'/g)].map((m) => m[1]);
+  assert.ok(icones.length >= 2, 'esperava um ícone por tema: ' + icones.join(', '));
+  for (const ico of icones) {
+    assert.ok(fs.existsSync(path.join(raiz, 'icons', ico)), 'ícone ausente: ' + ico);
+  }
+  assert.match(ps1, /icons\\\$arqIcone/);
+
   assert.match(ps1, /'index\.html'/);
   assert.ok(fs.existsSync(path.join(raiz, 'index.html')));
   /* abre em modo aplicativo, sem barra de enderecos */
   assert.match(ps1, /--app=/);
+  /* e o tema corporativo entra pela URL */
+  assert.match(ps1, /\?tema=corporativo/);
 });
 
 /* ------------------------------------------------ identidade do app por tema */
