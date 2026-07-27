@@ -36,7 +36,7 @@ jobs:
       - name: Reunir os arquivos do site (a ferramenta e estatica, sem build)
         run: |
           mkdir -p _site
-          cp index.html manifest.json sw.js README.md LICENSE _site/
+          cp index.html manifest.json manifest-corporativo.json sw.js README.md LICENSE _site/
           cp -r css js icons cisalhamento _site/
 
       - name: Empacotar

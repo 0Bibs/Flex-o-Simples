@@ -7,16 +7,23 @@
 #  cria um arquivo .lnk na Area de Trabalho e no Menu Iniciar.
 # ---------------------------------------------------------------------------
 
+param(
+    # 'classico' (azul) ou 'corporativo' (cinza grafite e amarelo)
+    [ValidateSet('classico', 'corporativo')]
+    [string]$Tema = 'classico'
+)
+
 $ErrorActionPreference = 'Stop'
 $raiz = Split-Path -Parent $PSScriptRoot
 
 # --- o que abrir: a copia local, se existir; senao a versao publicada --------
+$sufixo = if ($Tema -eq 'corporativo') { '?tema=corporativo' } else { '' }
 $paginaLocal = Join-Path $raiz 'index.html'
 if (Test-Path $paginaLocal) {
-    $alvo = 'file:///' + ($paginaLocal -replace '\\', '/')
+    $alvo = 'file:///' + ($paginaLocal -replace '\\', '/') + $sufixo
     $origem = 'arquivos locais'
 } else {
-    $alvo = 'https://0bibs.github.io/Flex-o-Simples/'
+    $alvo = 'https://0bibs.github.io/Flex-o-Simples/' + $sufixo
     $origem = 'versao publicada'
 }
 
@@ -54,14 +61,18 @@ if (-not $navegador) {
 }
 
 # --- icone ------------------------------------------------------------------
-$icone = Join-Path $raiz 'icons\flexo-simples.ico'
+$arqIcone = if ($Tema -eq 'corporativo') { 'flexo-simples-corporativo.ico' }
+            else { 'flexo-simples.ico' }
+$icone = Join-Path $raiz "icons\$arqIcone"
 if (-not (Test-Path $icone)) { $icone = $navegador }
 
 # --- cria os atalhos --------------------------------------------------------
 $shell = New-Object -ComObject WScript.Shell
+$nome = if ($Tema -eq 'corporativo') { 'Flexo Simples (corporativo)' }
+        else { 'Flexo Simples' }
 $destinos = @(
-    (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Flexo Simples.lnk'),
-    (Join-Path ([Environment]::GetFolderPath('StartMenu')) 'Programs\Flexo Simples.lnk')
+    (Join-Path ([Environment]::GetFolderPath('Desktop')) "$nome.lnk"),
+    (Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs\$nome.lnk")
 )
 
 foreach ($destino in $destinos) {
@@ -79,6 +90,7 @@ foreach ($destino in $destinos) {
 
 Write-Host ''
 Write-Host '  Pronto.' -ForegroundColor Green
+Write-Host "  Tema:      $Tema"
 Write-Host "  Navegador: $navegador"
 Write-Host "  Abrindo:   $origem"
 Write-Host ''

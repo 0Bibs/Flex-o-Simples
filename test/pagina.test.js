@@ -296,3 +296,50 @@ test('o script do atalho aponta para arquivos que existem', () => {
   /* abre em modo aplicativo, sem barra de enderecos */
   assert.match(ps1, /--app=/);
 });
+
+/* ------------------------------------------------ identidade do app por tema */
+
+const manCorp = JSON.parse(
+  fs.readFileSync(path.join(raiz, 'manifest-corporativo.json'), 'utf8'));
+
+test('o manifesto corporativo e completo e usa a identidade da empresa', () => {
+  for (const campo of ['name', 'short_name', 'start_url', 'display', 'icons']) {
+    assert.ok(manCorp[campo], 'faltou o campo ' + campo);
+  }
+  assert.strictEqual(manCorp.theme_color, '#2b2b2b');
+  assert.ok(manCorp.start_url.includes('tema=corporativo'), manCorp.start_url);
+  /* icones proprios, nao os do tema classico */
+  const usados = manCorp.icons.map((i) => i.src);
+  assert.ok(usados.every((s) => s.includes('corp-')), usados.join(', '));
+  for (const icone of manCorp.icons) {
+    assert.ok(fs.existsSync(path.join(raiz, icone.src)), 'ausente: ' + icone.src);
+    const { largura, altura } = dimensoesPng(icone.src);
+    assert.strictEqual(`${largura}x${altura}`, icone.sizes, icone.src);
+  }
+  const tamanhos = manCorp.icons.map((i) => i.sizes);
+  assert.ok(tamanhos.includes('192x192') && tamanhos.includes('512x512'));
+  assert.ok(manCorp.icons.some((i) => i.purpose === 'maskable'));
+});
+
+test('o tema troca o manifesto e respeita ?tema= na URL', () => {
+  const tema = fs.readFileSync(path.join(raiz, 'js/tema.js'), 'utf8');
+  assert.match(tema, /manifest-corporativo\.json/);
+  assert.match(tema, /link\[rel="manifest"\]/);
+  assert.match(tema, /tema=\(\[a-z\]\+\)/);
+});
+
+test('os dois manifestos e os icones corporativos estao no cache offline', () => {
+  const lista = sw.slice(sw.indexOf('var ARQUIVOS'), sw.indexOf('];', sw.indexOf('var ARQUIVOS')));
+  const emCache = [...lista.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  assert.ok(emCache.includes('manifest-corporativo.json'));
+  for (const icone of manCorp.icons) {
+    assert.ok(emCache.includes(icone.src), 'fora do cache: ' + icone.src);
+  }
+});
+
+test('o .ico corporativo e valido', () => {
+  const b = fs.readFileSync(path.join(raiz, 'icons/flexo-simples-corporativo.ico'));
+  assert.strictEqual(b.readUInt16LE(0), 0);
+  assert.strictEqual(b.readUInt16LE(2), 1);
+  assert.ok(b.readUInt16LE(4) >= 4);
+});

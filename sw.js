@@ -11,7 +11,7 @@
    --------------------------------------------------------------------------- */
 'use strict';
 
-var CACHE = 'flexo-simples-v3';
+var CACHE = 'flexo-simples-v4';
 
 /* Tudo o que a ferramenta precisa para funcionar offline.
    Mantido em sincronia com index.html pelo test/pagina.test.js */
@@ -19,6 +19,7 @@ var ARQUIVOS = [
   './',
   'index.html',
   'manifest.json',
+  'manifest-corporativo.json',
   'css/styles.css',
   'js/norma.js',
   'js/flexao.js',
@@ -34,7 +35,11 @@ var ARQUIVOS = [
   'icons/icon-180.png',
   'icons/icon-192.png',
   'icons/icon-512.png',
-  'icons/icon-maskable-512.png'
+  'icons/icon-maskable-512.png',
+  'icons/corp-180.png',
+  'icons/corp-192.png',
+  'icons/corp-512.png',
+  'icons/corp-maskable-512.png'
 ];
 
 self.addEventListener('install', function (evento) {

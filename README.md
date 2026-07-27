@@ -32,11 +32,13 @@ Há três caminhos, do mais simples ao mais manual:
 janela própria, ícone no menu iniciar e funcionamento offline.
 
 **2. Criar um atalho.** Baixe o repositório (*Code → Download ZIP*) e dê duplo
-clique em `atalho/Criar atalho (Windows).cmd`. Ele cria um atalho na Área de
-Trabalho e no Menu Iniciar que abre a ferramenta em **modo aplicativo** — janela
-sem barra de endereços nem abas — com o ícone próprio. Não instala nada nem mexe
-no registro do Windows: só cria dois arquivos `.lnk`. Se o `index.html` estiver
-junto, o atalho aponta para a cópia local; senão, para a versão publicada.
+clique em `atalho/Criar atalho (Windows).cmd` — ou em
+`atalho/Criar atalho corporativo (Windows).cmd`, que usa o tema cinza e amarelo
+e o ícone correspondente. Ele cria um atalho na Área de Trabalho e no Menu
+Iniciar que abre a ferramenta em **modo aplicativo** — janela sem barra de
+endereços nem abas. Não instala nada nem mexe no registro do Windows: só cria
+dois arquivos `.lnk`. Se o `index.html` estiver junto, o atalho aponta para a
+cópia local; senão, para a versão publicada.
 
 Para fazer à mão, o atalho é só isto no campo *Destino*:
 
@@ -100,6 +102,18 @@ identidade visual.
 
 Para o tema corporativo virar o padrão, troque `"classico"` por `"corporativo"`
 no trecho embutido no `<head>` das duas páginas e em `js/tema.js`.
+
+### O aplicativo instalado segue o tema
+
+Cada tema tem o seu **manifesto** e o seu jogo de ícones, e o `js/tema.js` troca
+o `<link rel="manifest">` junto com a aparência. Então, se você escolher
+*Corporativo* **antes** de instalar, o aplicativo entra no menu iniciar com o
+ícone grafite e amarelo e abre já no tema certo — o `start_url` carrega
+`?tema=corporativo`, que tem prioridade sobre a preferência guardada.
+
+Para trocar a identidade de um aplicativo já instalado, desinstale e instale de
+novo com o tema desejado ativo. O mesmo vale para o atalho: há um `.cmd` para
+cada tema, cada um com o seu `.ico`.
 
 ## O que a ferramenta faz
 
@@ -196,7 +210,7 @@ Testes automatizados (sem dependências, com o `node:test` nativo):
 node --test
 ```
 
-São 47 testes em três arquivos, executados a cada push pelo
+São 51 testes em três arquivos, executados a cada push pelo
 `.github/workflows/testes.yml`:
 
 - `test/flexao.test.js` — o caso de referência, os parâmetros normativos dos dois grupos de
@@ -220,7 +234,8 @@ São 47 testes em três arquivos, executados a cada push pelo
 ```
 index.html                    interface da flexão
 cisalhamento/index.html       interface de cortante e torção
-manifest.json                 identidade da PWA (nome, cores, ícones)
+manifest.json                 identidade da PWA no tema clássico
+manifest-corporativo.json     identidade da PWA no tema corporativo
 sw.js                         service worker: cache offline e instalação
 icons/                        ícones da aplicação instalada
 css/styles.css                estilo, compartilhado pelas duas ferramentas
