@@ -258,3 +258,40 @@ test('os desenhos de cortante e torcao produzem SVG valido', () => {
     }
   }
 });
+
+/* ------------------------------------------------ atalho do Windows */
+
+test('o icone .ico e valido e tem varios tamanhos', () => {
+  const b = fs.readFileSync(path.join(raiz, 'icons/flexo-simples.ico'));
+  assert.strictEqual(b.readUInt16LE(0), 0, 'campo reservado deve ser zero');
+  assert.strictEqual(b.readUInt16LE(2), 1, 'tipo deve ser 1 (ícone)');
+  const n = b.readUInt16LE(4);
+  assert.ok(n >= 4, `esperava vários tamanhos, achei ${n}`);
+  const vistos = [];
+  for (let i = 0; i < n; i++) {
+    const off = 6 + i * 16;
+    const lado = b[off] === 0 ? 256 : b[off];
+    const bytes = b.readUInt32LE(off + 8);
+    const inicio = b.readUInt32LE(off + 12);
+    assert.ok(inicio + bytes <= b.length, `entrada ${i} aponta fora do arquivo`);
+    vistos.push(lado);
+  }
+  for (const lado of [16, 32, 48, 256]) {
+    assert.ok(vistos.includes(lado), `faltou o tamanho ${lado}: ${vistos.join(', ')}`);
+  }
+});
+
+test('o script do atalho aponta para arquivos que existem', () => {
+  const ps1 = fs.readFileSync(path.join(raiz, 'atalho/criar-atalho.ps1'), 'utf8');
+  const cmd = fs.readFileSync(path.join(raiz, 'atalho/Criar atalho (Windows).cmd'), 'utf8');
+  /* o .cmd precisa de CRLF para o interpretador do Windows */
+  assert.ok(cmd.includes('\r\n'), 'o .cmd deve usar quebra de linha CRLF');
+  assert.match(cmd, /criar-atalho\.ps1/);
+  /* caminhos citados no script existem no repositorio */
+  assert.match(ps1, /icons\\flexo-simples\.ico/);
+  assert.ok(fs.existsSync(path.join(raiz, 'icons/flexo-simples.ico')));
+  assert.match(ps1, /'index\.html'/);
+  assert.ok(fs.existsSync(path.join(raiz, 'index.html')));
+  /* abre em modo aplicativo, sem barra de enderecos */
+  assert.match(ps1, /--app=/);
+});

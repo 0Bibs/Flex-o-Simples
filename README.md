@@ -24,6 +24,34 @@ A ferramenta está publicada em **https://0bibs.github.io/Flex-o-Simples/**.
 O fluxo `.github/workflows/pages.yml` republica o site a cada push na branch
 padrão — não há build, os arquivos vão direto.
 
+### Usar como um programa
+
+Há três caminhos, do mais simples ao mais manual:
+
+**1. Instalar pelo navegador (recomendado).** Veja abaixo — é um clique e dá
+janela própria, ícone no menu iniciar e funcionamento offline.
+
+**2. Criar um atalho.** Baixe o repositório (*Code → Download ZIP*) e dê duplo
+clique em `atalho/Criar atalho (Windows).cmd`. Ele cria um atalho na Área de
+Trabalho e no Menu Iniciar que abre a ferramenta em **modo aplicativo** — janela
+sem barra de endereços nem abas — com o ícone próprio. Não instala nada nem mexe
+no registro do Windows: só cria dois arquivos `.lnk`. Se o `index.html` estiver
+junto, o atalho aponta para a cópia local; senão, para a versão publicada.
+
+Para fazer à mão, o atalho é só isto no campo *Destino*:
+
+```
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --app="https://0bibs.github.io/Flex-o-Simples/"
+```
+
+**3. Abrir o arquivo.** Duplo clique no `index.html` — funciona, mas abre como
+uma aba comum do navegador.
+
+> Note que **nenhum dos três gera um `.exe`**. Um executável de verdade exigiria
+> empacotar um navegador junto (Electron, Tauri) e, sem certificado de assinatura
+> digital, o Windows exibiria o aviso do SmartScreen na primeira execução. O modo
+> aplicativo entrega a mesma experiência sem esse atrito.
+
 ### Instalar como aplicativo
 
 O site é uma **PWA**: abra o endereço acima no Chrome ou no Edge e use
@@ -141,7 +169,7 @@ Testes automatizados (sem dependências, com o `node:test` nativo):
 node --test
 ```
 
-São 45 testes em três arquivos, executados a cada push pelo
+São 47 testes em três arquivos, executados a cada push pelo
 `.github/workflows/testes.yml`:
 
 - `test/flexao.test.js` — o caso de referência, os parâmetros normativos dos dois grupos de
@@ -157,6 +185,8 @@ São 45 testes em três arquivos, executados a cada push pelo
   dois SVG sem `NaN` para seção retangular, T, armadura dupla e momento nulo. Cobre também
   a PWA: campos obrigatórios do manifesto, dimensão real dos PNG conferida contra o
   declarado, e a lista de cache do `sw.js` em sincronia com o que a página realmente usa.
+  Confere ainda o `.ico` do atalho (cabeçalho, tamanhos e deslocamentos) e se o script do
+  atalho aponta para arquivos existentes.
 
 ## Estrutura
 
@@ -177,7 +207,8 @@ js/desenho-cisalhamento.js    seção com estribos, seção vazada e bielas
 js/app-cisalhamento.js        interface de cortante e torção
 test/flexao.test.js           testes da flexão
 test/cisalhamento.test.js     testes de cortante e torção
-test/pagina.test.js           consistência das páginas, desenhos e PWA
+test/pagina.test.js           consistência das páginas, desenhos, PWA e atalho
+atalho/                       script que cria o atalho de aplicativo no Windows
 .github/workflows/            testes automáticos e publicação no GitHub Pages
 ```
 
