@@ -2,14 +2,31 @@
    Flexo Simples - folha de estilo unica
    --------------------------------------------------------------------------- */
 :root {
-  --teal: #35a0a0;
-  --azul: #2e75b6;
-  --azul-claro: #56aecd;
-  --borda: #a9a9a9;
-  --amarelo: #ffffcc;
-  --verde: #3aa84f;
-  --vermelho: #c00000;
+  /* --- convencao do desenho tecnico: nao muda com o tema --- */
+  --azul: #2e75b6;        /* deformacoes e estado atual */
+  --verde: #3aa84f;       /* cotas */
+  --vermelho: #c00000;    /* armadura */
   --cinza-txt: #7f7f7f;
+
+  /* --- identidade visual: e isto que o tema troca --- */
+  --fonte: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --fonte-titulo: var(--fonte);
+  --barra-fundo: #ffffff;   /* barra de titulo da janela */
+  --barra-txt: #1a1a1a;
+  --barra-borda: #e0e0e0;
+  --acento: #1f6fc4;        /* faixa, aba ativa, icone, foco */
+  --acento-txt: #ffffff;
+  --titulo: #2e75b6;        /* titulos do relatorio */
+  --painel-cab: #35a0a0;    /* cabecalhos do painel */
+  --painel-cab-2: #56aecd;
+  --botao-fundo: linear-gradient(#d2d2d2, #bdbdbd);
+  --botao-borda: #9a9a9a;
+  --botao-txt: #1a1a1a;
+  --caixa-fundo: #eef5fb;   /* caixa do seletor de modo */
+  --caixa-borda: #d6e5f3;
+  --borda: #a9a9a9;
+  --amarelo: #ffffcc;       /* campos de saida */
+  --teal: var(--painel-cab);
 }
 
 * { box-sizing: border-box; }
@@ -17,7 +34,7 @@
 html, body {
   height: 100%;
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--fonte);
   font-size: 12px;
   color: #1a1a1a;
   background: #f3f3f3;
@@ -37,15 +54,16 @@ html, body {
   align-items: center;
   height: 30px;
   flex: 0 0 30px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  border-bottom: 1px solid var(--barra-borda);
+  background: var(--barra-fundo);
+  color: var(--barra-txt);
 }
 .jicone {
   width: 17px; height: 17px;
   margin-left: 7px;
   border-radius: 3px;
-  background: #1f6fc4;
-  color: #fff;
+  background: var(--acento);
+  color: var(--acento-txt);
   font-size: 8.5px;
   font-weight: 700;
   display: flex;
@@ -57,7 +75,7 @@ html, body {
   flex: 1;
   padding: 0 10px;
   font-size: 12px;
-  color: #1a1a1a;
+  color: var(--barra-txt);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -68,10 +86,10 @@ html, body {
   display: flex; align-items: center; justify-content: center;
 }
 .jb::before { content: ""; display: block; }
-.jb-min::before { width: 10px; height: 1px; background: #303030; }
-.jb-max::before { width: 9px; height: 9px; border: 1px solid #303030; }
+.jb-min::before { width: 10px; height: 1px; background: var(--barra-txt); }
+.jb-max::before { width: 9px; height: 9px; border: 1px solid var(--barra-txt); }
 .jb-fec::before {
-  content: "\2715"; font-size: 11px; color: #303030;
+  content: "\2715"; font-size: 11px; color: var(--barra-txt);
   width: auto; height: auto; background: none;
 }
 
@@ -115,7 +133,7 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 select { padding-left: 3px; text-align: left; }
-input:focus, select:focus { outline: 1px solid var(--azul); outline-offset: -1px; }
+input:focus, select:focus { outline: 1px solid var(--acento); outline-offset: -1px; }
 .amarelo, output.saida { background: var(--amarelo); }
 output.saida { display: block; line-height: 17px; }
 
@@ -135,17 +153,17 @@ output.saida { display: block; line-height: 17px; }
   margin: 7px 0 5px;
   font-size: 14px;
   font-weight: 400;
-  color: var(--teal);
+  color: var(--painel-cab);
   cursor: pointer;
   user-select: none;
 }
-.grupo .cab-azul { color: var(--azul-claro); cursor: default; }
+.grupo .cab-azul { color: var(--painel-cab-2); cursor: default; }
 .grupo .cab-simples { cursor: default; }
 .chev {
   position: relative;
   flex: 0 0 15px;
   width: 15px; height: 15px;
-  border: 1.4px solid var(--teal);
+  border: 1.4px solid var(--painel-cab);
   border-radius: 50%;
 }
 .chev::before {
@@ -153,8 +171,8 @@ output.saida { display: block; line-height: 17px; }
   position: absolute;
   left: 4px; top: 3.5px;
   width: 5px; height: 5px;
-  border-left: 1.4px solid var(--teal);
-  border-bottom: 1.4px solid var(--teal);
+  border-left: 1.4px solid var(--painel-cab);
+  border-bottom: 1.4px solid var(--painel-cab);
   transform: rotate(-45deg);
 }
 .grupo.aberto .chev::before { top: 5px; transform: rotate(135deg); }
@@ -202,11 +220,11 @@ body.secao-t .campo.so-t { display: grid; }
   width: 100%;
   height: 27px;
   margin: 9px 0 7px;
-  border: 1px solid #9a9a9a;
-  background: linear-gradient(#d2d2d2, #bdbdbd);
+  border: 1px solid var(--botao-borda);
+  background: var(--botao-fundo);
   font: inherit;
   font-size: 13px;
-  color: #1a1a1a;
+  color: var(--botao-txt);
   cursor: pointer;
 }
 .botao:hover { background: linear-gradient(#dedede, #c9c9c9); }
@@ -261,21 +279,24 @@ body.secao-t .campo.so-t { display: grid; }
   pointer-events: none;
 }
 .relatorio h1 {
+  font-family: var(--fonte-titulo);
   font-size: 40px;
   font-weight: 300;
-  color: var(--azul);
+  color: var(--titulo);
   margin: 20px 22px 4px;
 }
 .relatorio h2 {
+  font-family: var(--fonte-titulo);
   font-size: 29px;
   font-weight: 300;
-  color: var(--azul);
+  color: var(--titulo);
   margin: 24px 22px 8px;
 }
 .relatorio h3 {
+  font-family: var(--fonte-titulo);
   font-size: 20px;
   font-weight: 300;
-  color: var(--azul);
+  color: var(--titulo);
   margin: 16px 22px 4px;
 }
 .relatorio .bloco { margin: 0 22px; }
@@ -354,9 +375,9 @@ body.secao-t .campo.so-t { display: grid; }
 }
 .abas a:hover { background: #ededed; }
 .abas a.ativa {
-  color: #fff;
-  background: #1f6fc4;
-  border-color: #1f6fc4;
+  color: var(--acento-txt);
+  background: var(--acento);
+  border-color: var(--acento);
   font-weight: 600;
 }
 
@@ -367,8 +388,8 @@ body.secao-t .campo.so-t { display: grid; }
   align-items: center;
   margin-bottom: 9px;
   padding: 5px 6px;
-  background: #eef5fb;
-  border: 1px solid #d6e5f3;
+  background: var(--caixa-fundo);
+  border: 1px solid var(--caixa-borda);
 }
 .modos label {
   display: flex;
@@ -376,7 +397,7 @@ body.secao-t .campo.so-t { display: grid; }
   gap: 4px;
   font-size: 11.5px;
   font-style: italic;
-  color: #1f6fc4;
+  color: var(--painel-cab-2);
   cursor: pointer;
 }
 .modos input { width: 13px; height: 13px; margin: 0; }
@@ -419,3 +440,123 @@ output.saida-plana {
 .dg-barra-boa { fill: #4a9d5f; }
 .dg-barra-ruim { fill: #c0392b; }
 .dg-limite { stroke: #9a9a9a; stroke-width: 1; stroke-dasharray: 4 3; }
+
+/* ===========================================================================
+   TEMA CORPORATIVO
+   Cinza grafite no cabeçalho, amarelo como cor de acento e tipografia
+   condensada. Só troca identidade visual: as cores do desenho técnico
+   (verde nas cotas, vermelho na armadura, azul nas deformações) são
+   convenção e ficam como estão em qualquer tema.
+   =========================================================================== */
+html[data-tema="corporativo"] {
+  /* Petrobras Sans quando instalada na máquina; senão uma condensada
+     equivalente. Nada é baixado: a ferramenta continua sem dependência. */
+  --fonte: "Petrobras Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --fonte-titulo: "Petrobras Sans", "PT Sans Narrow", "Arial Narrow",
+    "Segoe UI", sans-serif;
+
+  --barra-fundo: #2b2b2b;        /* cinza grafite */
+  --barra-txt: #f1f1f1;
+  --barra-borda: #1d1d1d;
+  --acento: #ffc20e;             /* amarelo */
+  --acento-txt: #1c1c1c;
+  --titulo: #2b2b2b;
+  --painel-cab: #3d3d3d;
+  --painel-cab-2: #8a8a8a;
+  --botao-fundo: linear-gradient(#3a3a3a, #2b2b2b);
+  --botao-borda: #1d1d1d;
+  --botao-txt: #f1f1f1;
+  --caixa-fundo: #f4f4f4;
+  --caixa-borda: #dcdcdc;
+  --amarelo: #fff6da;
+}
+
+html[data-tema="corporativo"] .botao:hover {
+  background: var(--acento);
+  color: var(--acento-txt);
+  border-color: #d8a300;
+}
+html[data-tema="corporativo"] .botao:active { background: #e0a800; }
+
+html[data-tema="corporativo"] .abas a {
+  color: #d6d6d6;
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+}
+html[data-tema="corporativo"] .abas a:hover { background: #474747; }
+
+/* a hachura diagonal dá lugar a uma barra sólida com a marca */
+html[data-tema="corporativo"] .faixa {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 48px;
+  padding: 0 22px;
+  background: var(--barra-fundo);
+  border-bottom: 3px solid var(--acento);
+}
+html[data-tema="corporativo"] .faixa::before,
+html[data-tema="corporativo"] .faixa::after {
+  font-family: var(--fonte-titulo);
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .5px;
+}
+/* contorno vazado, como na marca de referência */
+html[data-tema="corporativo"] .faixa::before {
+  content: "FLEXO";
+  color: transparent;
+  -webkit-text-stroke: 1.4px #ffffff;
+}
+html[data-tema="corporativo"] .faixa::after {
+  content: "SIMPLES";
+  color: var(--acento);
+}
+html[data-tema="corporativo"] .marca { display: none; }
+
+html[data-tema="corporativo"] .relatorio h1 {
+  font-weight: 700;
+  letter-spacing: -.5px;
+}
+html[data-tema="corporativo"] .relatorio h2,
+html[data-tema="corporativo"] .relatorio h3 { font-weight: 600; }
+/* filete amarelo antes de cada seção do relatório */
+html[data-tema="corporativo"] .relatorio h2 {
+  border-left: 4px solid var(--acento);
+  padding-left: 9px;
+  margin-left: 18px;
+}
+html[data-tema="corporativo"] .marca-min { background: #fff1c2; color: #7a5800; }
+
+/* ----------------------------------------------------- botão de tema */
+.bt-tema {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  margin-right: 6px;
+  padding: 0 9px;
+  border: 1px solid #dcdcdc;
+  border-radius: 3px;
+  background: #f6f6f6;
+  color: #4a4a4a;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bt-tema:hover { background: #ededed; }
+.bt-tema::before {
+  content: "";
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--acento);
+  border: 1px solid rgba(0, 0, 0, .25);
+}
+html[data-tema="corporativo"] .bt-tema {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+  color: #d6d6d6;
+}
+html[data-tema="corporativo"] .bt-tema:hover { background: #474747; }

@@ -10,6 +10,7 @@
 <meta name="description" content="Cálculo de armadura transversal de cortante e torção em vigas de concreto armado, segundo a ABNT NBR 6118.">
 <link rel="apple-touch-icon" href="../icons/icon-180.png">
 <link rel="stylesheet" href="../css/styles.css">
+<script>/* aplica o tema antes de pintar, para a pagina nao piscar */try{var t=localStorage.getItem("flexo-simples-tema");document.documentElement.setAttribute("data-tema",t==="corporativo"?"corporativo":"classico")}catch(e){}</script>
 </head>
 <body>
 
@@ -22,6 +23,7 @@
       <a href="../index.html">Flexão</a>
       <a href="index.html" class="ativa" aria-current="page">Cortante/Torção</a>
     </nav>
+    <button type="button" class="bt-tema" id="btTema">Clássico</button>
     <span class="jbotoes" aria-hidden="true">
       <span class="jb jb-min"></span>
       <span class="jb jb-max"></span>
@@ -256,5 +258,6 @@
 <script src="../js/cisalhamento.js"></script>
 <script src="../js/desenho-cisalhamento.js"></script>
 <script src="../js/app-cisalhamento.js"></script>
+<script src="../js/tema.js"></script>
 </body>
 </html>

@@ -74,6 +74,33 @@ para forçar a limpeza do cache antigo.
 > exige permissão de administrador do repositório e retorna
 > `Resource not accessible by integration`.
 
+## Temas
+
+São dois temas, com **exatamente o mesmo cálculo por trás** — muda só a
+identidade visual. O botão na barra de título alterna, e a escolha fica guardada
+no navegador, valendo para as duas ferramentas.
+
+| | Clássico | Corporativo |
+|---|---|---|
+| Cabeçalho | branco | **cinza grafite** `#2b2b2b` |
+| Acento | azul `#1f6fc4` | **amarelo** `#ffc20e` |
+| Faixa do relatório | hachura diagonal azul | barra sólida grafite com a marca e filete amarelo |
+| Tipografia | Segoe UI | Petrobras Sans → PT Sans Narrow → Arial Narrow |
+
+Sobre a fonte: nada é baixado. A pilha usa a **Petrobras Sans** quando ela está
+instalada na máquina — o caso das estações da empresa — e cai para PT Sans
+Narrow ou Arial Narrow, presentes em qualquer Windows e com o mesmo ar
+condensado. Empacotar a PT Sans Narrow custaria 88 KB nos dois pesos, mais que
+dobrando o tamanho do aplicativo offline; se preferir garantir a fonte em
+qualquer máquina, é uma mudança de poucas linhas.
+
+As cores dos desenhos **não** mudam com o tema: verde nas cotas, vermelho na
+armadura e azul nas deformações são convenção de desenho técnico, não
+identidade visual.
+
+Para o tema corporativo virar o padrão, troque `"classico"` por `"corporativo"`
+no trecho embutido no `<head>` das duas páginas e em `js/tema.js`.
+
 ## O que a ferramenta faz
 
 **Painel esquerdo (entrada)**
@@ -202,6 +229,7 @@ js/flexao.js                  núcleo da flexão
 js/desenho-equilibrio.js      desenho do equilíbrio da seção
 js/desenho-dominios.js        desenho dos domínios de deformação
 js/app.js                     interface da flexão
+js/tema.js                    alternância entre os temas clássico e corporativo
 js/cisalhamento.js            núcleo de cortante e torção
 js/desenho-cisalhamento.js    seção com estribos, seção vazada e bielas
 js/app-cisalhamento.js        interface de cortante e torção
