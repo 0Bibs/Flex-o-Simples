@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flexo Simples — cortante e torção</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%231f6fc4'/><text x='16' y='23' font-size='17' font-family='Segoe UI,Arial' fill='white' text-anchor='middle'>FS</text></svg>">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#1f6fc4">
+<meta name="description" content="Cálculo de armadura transversal de cortante e torção em vigas de concreto armado, segundo a ABNT NBR 6118.">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<div class="janela">
+
+  <header class="titulo-janela">
+    <span class="jicone">FS</span>
+    <span class="jtitulo">Cálculo de armadura transversal — cortante e torção</span>
+    <nav class="abas">
+      <a href="../index.html">Flexão</a>
+      <a href="index.html" class="ativa" aria-current="page">Cortante/Torção</a>
+    </nav>
+    <span class="jbotoes" aria-hidden="true">
+      <span class="jb jb-min"></span>
+      <span class="jb jb-max"></span>
+      <span class="jb jb-fec"></span>
+    </span>
+  </header>
+
+  <div class="conteudo">
+
+    <aside class="painel">
+
+      <div class="linha-norma">
+        <label for="norma">Norma</label>
+        <select id="norma">
+          <option value="2023">ABNT NBR 6118:2023</option>
+          <option value="2014">ABNT NBR 6118:2014</option>
+        </select>
+      </div>
+
+      <div class="modos">
+        <label><input type="radio" name="modo" value="CORTANTE" checked> Cortante</label>
+        <label><input type="radio" name="modo" value="TORCAO"> Torção</label>
+        <label><input type="radio" name="modo" value="AMBOS"> Ambos</label>
+      </div>
+
+      <section class="grupo aberto">
+        <h2 class="cab"><span class="chev"></span>Materiais</h2>
+        <div class="corpo">
+          <div class="campo">
+            <label for="fyk">f<sub>ywk</sub></label>
+            <input type="number" id="fyk" value="500" step="10" min="1">
+            <span class="un">MPa</span>
+          </div>
+          <div class="campo">
+            <label for="gammaC">γ<sub>c</sub></label>
+            <input type="number" id="gammaC" value="1.4" step="0.05" min="1">
+            <span class="un"></span>
+          </div>
+          <div class="campo">
+            <label for="gammaS">γ<sub>s</sub></label>
+            <input type="number" id="gammaS" value="1.15" step="0.05" min="1">
+            <span class="un"></span>
+          </div>
+          <div class="campo">
+            <label for="fck">f<sub>ck</sub></label>
+            <input type="number" id="fck" value="30" step="5" min="10" max="90">
+            <span class="un">MPa</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grupo aberto">
+        <h2 class="cab"><span class="chev"></span>Geometria</h2>
+        <div class="corpo">
+          <div class="campo campo-larga">
+            <label for="bw">b<sub>w</sub></label>
+            <input type="number" id="bw" value="40" step="1" min="1">
+            <span class="un">cm</span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="bwMin">b<sub>w,mín</sub></label>
+            <input type="number" id="bwMin" value="40" step="1" min="1">
+            <span class="un">cm</span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="h">h</label>
+            <input type="number" id="h" value="50" step="1" min="1">
+            <span class="un">cm</span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="d">d</label>
+            <input type="number" id="d" value="47.5" step="0.5" min="1">
+            <span class="un">cm</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grupo">
+        <h2 class="cab"><span class="chev"></span>Modelo</h2>
+        <div class="corpo">
+          <div class="campo campo-larga">
+            <label for="modelo">Modelo</label>
+            <select id="modelo">
+              <option value="I">I — biela a 45°</option>
+              <option value="II">II — biela variável</option>
+            </select>
+            <span class="un"></span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="theta">θ</label>
+            <input type="number" id="theta" value="45" step="1" min="30" max="45">
+            <span class="un">graus</span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="alpha">α</label>
+            <input type="number" id="alpha" value="90" step="5" min="45" max="90">
+            <span class="un">graus</span>
+          </div>
+          <p class="nota">θ: inclinação da biela (só no modelo II).<br>α: inclinação do estribo.</p>
+        </div>
+      </section>
+
+      <section class="grupo aberto sem-linha so-v">
+        <h2 class="cab cab-azul">Força cortante (tf)</h2>
+        <div class="corpo">
+          <div class="esforco-cab">
+            <span>V<sub>Sd</sub></span><span>=</span><span>V<sub>Sk</sub></span>
+            <span>x</span><span>γ<sub>f</sub></span>
+          </div>
+          <div class="esforco">
+            <input type="number" id="vsd" value="7.00" step="0.01">
+            <span class="op">=</span>
+            <input type="number" id="vsk" value="5.00" step="0.01">
+            <span class="op">x</span>
+            <input type="number" id="gammaF" value="1.4" step="0.05" min="1">
+          </div>
+        </div>
+      </section>
+
+      <section class="grupo aberto sem-linha so-t">
+        <h2 class="cab cab-azul">Torção (tfm)</h2>
+        <div class="corpo">
+          <div class="esforco-cab">
+            <span>T<sub>Sd</sub></span><span>=</span><span>T<sub>Sk</sub></span>
+            <span>x</span><span>γ<sub>f</sub></span>
+          </div>
+          <div class="esforco">
+            <input type="number" id="tsd" value="6.96" step="0.01">
+            <span class="op">=</span>
+            <input type="number" id="tsk" value="4.97" step="0.01">
+            <span class="op">x</span>
+            <output id="gammaFT" class="saida-plana"></output>
+          </div>
+          <div class="campo campo-larga" style="margin-top:5px">
+            <label for="c1">c<sub>1</sub></label>
+            <input type="number" id="c1" value="2.5" step="0.5" min="0">
+            <span class="un">cm</span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="refMin">A<sub>90,mín</sub></label>
+            <select id="refMin">
+              <option value="bw/2">ρ · b_w/2</option>
+              <option value="he">ρ · h_e</option>
+              <option value="bw">ρ · b_w</option>
+            </select>
+            <span class="un"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grupo aberto sem-cab">
+        <h2 class="cab cab-simples">Estribos</h2>
+        <div class="corpo">
+          <div class="campo campo-larga">
+            <label for="diamEstribo">Ø</label>
+            <select id="diamEstribo"></select>
+            <span class="un">mm</span>
+          </div>
+          <div class="campo campo-larga">
+            <label for="nRamos">Ramos</label>
+            <input type="number" id="nRamos" value="2" step="1" min="2" max="6">
+            <span class="un"></span>
+          </div>
+          <div class="campo campo-larga">
+            <label>s</label>
+            <output id="outS" class="amarelo saida"></output>
+            <span class="un">cm</span>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+    <main class="relatorio" id="relatorio">
+      <div class="faixa"><span class="marca">Flexo Simples</span></div>
+
+      <h1 id="titulo">Cortante</h1>
+
+      <h2>Resultados</h2>
+      <div id="repAvisos"></div>
+
+      <div class="so-v">
+        <h3>Cortante</h3>
+        <div class="bloco" id="repCortante"></div>
+      </div>
+
+      <div class="so-t">
+        <h3>Torção</h3>
+        <div class="bloco" id="repTorcao"></div>
+      </div>
+
+      <div class="so-vt">
+        <h3>Cortante + torção</h3>
+        <div class="bloco" id="repInteracao"></div>
+      </div>
+
+      <h3>Estribos</h3>
+      <div class="bloco" id="repEstribos"></div>
+
+      <h2>Seção</h2>
+      <div class="figura" id="repSecao"></div>
+
+      <div class="so-t">
+        <h2>Seção vazada equivalente</h2>
+        <div class="figura" id="repVazada"></div>
+      </div>
+
+      <h2>Bielas comprimidas</h2>
+      <div class="figura" id="repBielas"></div>
+      <hr>
+
+      <h2>Dados</h2>
+      <h3>Informações gerais</h3>
+      <div class="bloco" id="repGeral"></div>
+      <h3>Geometria</h3>
+      <div class="bloco" id="repGeometria"></div>
+      <h3>Materiais</h3>
+      <div class="bloco" id="repMateriais"></div>
+      <h3>Esforços</h3>
+      <div class="bloco" id="repEsforcos"></div>
+      <hr>
+      <p class="rodape">
+        Ferramenta livre de cálculo de armadura transversal segundo a ABNT NBR 6118.
+        Os resultados devem ser conferidos por profissional habilitado.
+      </p>
+    </main>
+
+  </div>
+</div>
+
+<script src="../js/norma.js"></script>
+<script src="../js/cisalhamento.js"></script>
+<script src="../js/desenho-cisalhamento.js"></script>
+<script src="../js/app-cisalhamento.js"></script>
+</body>
+</html>

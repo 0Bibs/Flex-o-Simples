@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html manifest.json sw.js README.md LICENSE _site/
-          cp -r css js icons _site/
+          cp -r css js icons cisalhamento _site/
 
       - name: Empacotar
         uses: actions/upload-pages-artifact@v3

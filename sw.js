@@ -11,7 +11,7 @@
    --------------------------------------------------------------------------- */
 'use strict';
 
-var CACHE = 'flexo-simples-v1';
+var CACHE = 'flexo-simples-v2';
 
 /* Tudo o que a ferramenta precisa para funcionar offline.
    Mantido em sincronia com index.html pelo test/pagina.test.js */
@@ -25,6 +25,11 @@ var ARQUIVOS = [
   'js/desenho-equilibrio.js',
   'js/desenho-dominios.js',
   'js/app.js',
+  'cisalhamento/',
+  'cisalhamento/index.html',
+  'js/cisalhamento.js',
+  'js/desenho-cisalhamento.js',
+  'js/app-cisalhamento.js',
   'icons/icon-180.png',
   'icons/icon-192.png',
   'icons/icon-512.png',

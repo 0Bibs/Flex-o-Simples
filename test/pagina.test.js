@@ -179,3 +179,82 @@ test('o registro do service worker so acontece sob http/https', () => {
   assert.match(app, /location\.protocol/);
   assert.match(app, /register\('sw\.js'\)/);
 });
+
+/* ------------------------------------------------ segunda ferramenta */
+
+const htmlCis = fs.readFileSync(path.join(raiz, 'cisalhamento/index.html'), 'utf8');
+const appCis = fs.readFileSync(path.join(raiz, 'js/app-cisalhamento.js'), 'utf8');
+
+/* referencias da pagina de cisalhamento, normalizadas para a raiz do site */
+function referenciasCis() {
+  return [...htmlCis.matchAll(/(?:src|href)="([^"#:]+)"/g)]
+    .map((m) => m[1])
+    .filter((ref) => !ref.startsWith('data:') && !ref.startsWith('//'))
+    .map((ref) => (ref.startsWith('../') ? ref.slice(3) : 'cisalhamento/' + ref));
+}
+
+test('a pagina de cisalhamento referencia apenas arquivos existentes', () => {
+  const refs = referenciasCis();
+  assert.ok(refs.length >= 6, `poucas referencias: ${refs.length}`);
+  refs.forEach(function (ref) {
+    assert.ok(fs.existsSync(path.join(raiz, ref)), 'arquivo ausente: ' + ref);
+  });
+});
+
+test('as duas ferramentas se referenciam mutuamente', () => {
+  assert.match(html, /href="cisalhamento\/index\.html"/);
+  assert.match(htmlCis, /href="\.\.\/index\.html"/);
+});
+
+test('todo id usado pela interface de cisalhamento existe na pagina', () => {
+  const ids = new Set();
+  for (const m of htmlCis.matchAll(/\bid="([^"]+)"/g)) ids.add(m[1]);
+  const usados = new Set();
+  for (const m of appCis.matchAll(/\$\('([^']+)'\)/g)) usados.add(m[1]);
+  for (const m of appCis.matchAll(/'([a-zA-Z][a-zA-Z0-9]*)'(?=[,\]])/g)) {
+    if (ids.has(m[1])) usados.add(m[1]);
+  }
+  const faltando = [...usados].filter((id) => !ids.has(id));
+  assert.deepStrictEqual(faltando, [], 'ids ausentes: ' + faltando.join(', '));
+  assert.ok(usados.size > 15, `esperava muitos ids, achei ${usados.size}`);
+});
+
+test('a pagina de cisalhamento tambem nao carrega nada de fora', () => {
+  const externos = [...htmlCis.matchAll(/(?:src|href)="(https?:)?\/\/[^"]+"/g)];
+  assert.deepStrictEqual(externos.map((m) => m[0]), []);
+});
+
+test('o service worker guarda em cache a segunda ferramenta', () => {
+  const lista = sw.slice(sw.indexOf('var ARQUIVOS'), sw.indexOf('];', sw.indexOf('var ARQUIVOS')));
+  const emCache = [...lista.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  assert.ok(emCache.includes('cisalhamento/'), 'falta a raiz da segunda ferramenta');
+  for (const ref of new Set(referenciasCis())) {
+    assert.ok(emCache.includes(ref), 'fora do cache: ' + ref);
+  }
+});
+
+test('os desenhos de cortante e torcao produzem SVG valido', () => {
+  const escopo = {};
+  for (const f of ['js/norma.js', 'js/cisalhamento.js', 'js/desenho-cisalhamento.js']) {
+    new Function('globalThis', fs.readFileSync(path.join(raiz, f), 'utf8'))(escopo);
+  }
+  const FS2 = escopo.FS;
+  const base = {
+    fck: 30, fyk: 500, gammaC: 1.4, gammaS: 1.15, gammaF: 1.4,
+    bw: 40, bwMin: 40, h: 50, d: 47.5, c1: 2.5,
+    modelo: 'I', theta: 45, alpha: 90, refMin: 'bw/2',
+    Vsd: 7, Tsd: 6.96, diamEstribo: 10, nRamos: 2
+  };
+  for (const modo of ['CORTANTE', 'TORCAO', 'AMBOS']) {
+    const r = FS2.Cisalhamento.calcular(Object.assign({}, base, { modo }));
+    const figuras = [['secao', FS2.DesenhoCisalhamento.secao(r)],
+      ['bielas', FS2.DesenhoCisalhamento.bielas(r)]];
+    if (r.torcao) figuras.push(['vazada', FS2.DesenhoCisalhamento.vazada(r)]);
+    for (const [nome, svg] of figuras) {
+      const onde = `${modo}/${nome}`;
+      assert.ok(svg.startsWith('<svg ') && svg.endsWith('</svg>'), onde);
+      assert.ok(!/NaN|undefined|Infinity/.test(svg), `${onde}: ` +
+        (svg.match(/[^ "]*(NaN|undefined|Infinity)[^ "]*/) || [''])[0]);
+    }
+  }
+});
