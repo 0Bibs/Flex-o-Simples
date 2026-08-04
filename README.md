@@ -127,12 +127,37 @@ cada tema, cada um com o seu `.ico`.
 | Armaduras | `As` por área, por `n × Ø` ou por `Ø c/ espaçamento`; `As'` |
 | Armadura mínima | ρmín, As,mín, As,máx e Md,mín; opção de adotar a mínima quando governar |
 | Armadura dupla | permitir ou não, `d'` e o limite `βx,lim` |
+| Identificação e exportação | projeto, elemento, responsável e revisão; botões de exportar a folha de resultados como imagem |
 
 A altura da seção é `h = d + d'`.
 
 **Painel direito (relatório)** — resultados (`As`, `As'`, `x`, `βx` e o domínio), desenho do
 equilíbrio da seção, diagrama dos domínios de deformação e a lista dos dados de entrada.
 Tudo é recalculado a cada alteração.
+
+## Exportar para o memorial de cálculo
+
+O grupo **Identificação e exportação**, no fim do painel, gera uma **folha de resultados em
+PNG** pronta para colar no corpo do documento:
+
+- **Baixar imagem** salva o arquivo (`flexo-simples-<elemento>-r<revisão>.png`);
+- **Copiar imagem** põe o PNG na área de transferência — no Word basta `Ctrl+V`.
+
+A folha sai da aba em que você está e traz exatamente o que está no relatório naquele
+momento: os blocos escondidos pelo modo atual (por exemplo, torção quando só o cortante
+está ligado) ficam de fora. No topo vai um quadro de **identificação** com projeto,
+elemento, responsável, revisão, data e a norma adotada. Os quatro campos ficam guardados
+no navegador, então continuam preenchidos na próxima vez.
+
+O que a folha **não** é: um *print* da tela. O painel de entrada e a moldura da janela
+ficam de fora, e as duas colunas de dados são reorganizadas para o documento não ficar
+com uma imagem desnecessariamente comprida. O tema em uso (clássico ou corporativo) vale
+também para a folha — só as cores de convenção do desenho técnico (verde nas cotas,
+vermelho na armadura, azul nas deformações) são as mesmas nos dois.
+
+A imagem é composta em SVG a partir do próprio relatório e rasterizada em 2× pelo
+`canvas` do navegador. Não há biblioteca nem serviço externo envolvido: funciona offline
+e com a página aberta por duplo clique.
 
 ## Base de cálculo — flexão
 
@@ -248,9 +273,11 @@ js/tema.js                    alternância entre os temas clássico e corporativ
 js/cisalhamento.js            núcleo de cortante e torção
 js/desenho-cisalhamento.js    seção com estribos, seção vazada e bielas
 js/app-cisalhamento.js        interface de cortante e torção
+js/exportar.js                folha de resultados em PNG (compartilhado)
 test/flexao.test.js           testes da flexão
 test/cisalhamento.test.js     testes de cortante e torção
 test/pagina.test.js           consistência das páginas, desenhos, PWA e atalho
+test/exportar.test.js         montagem da folha exportada
 atalho/                       script que cria o atalho de aplicativo no Windows
 .github/workflows/            testes automáticos e publicação no GitHub Pages
 ```
@@ -266,6 +293,9 @@ Os arquivos de `js/` funcionam tanto no navegador quanto no Node, sem transpila�
   não uma repetição do esforço solicitante.
 - Verificações de fissuração, flecha, ancoragem e detalhamento das barras **não** fazem
   parte destas ferramentas.
+- **Copiar imagem** depende da API de área de transferência do navegador, que só funciona
+  em `https://` ou `localhost`. Com a página aberta por duplo clique (`file://`) use
+  **Baixar imagem** — a geração da folha em si funciona nos dois casos.
 
 > Os resultados devem ser conferidos por profissional habilitado. O uso é de
 > responsabilidade do usuário.

@@ -251,6 +251,33 @@ body.secao-t .campo.so-t { display: grid; }
 #espacamento { width: 42px; flex: 0 0 42px; }
 .campo-asl { margin-top: 2px; }
 
+/* ----------------------------------------------------- identificação/exportação */
+.campo-id {
+  grid-template-columns: 78px 1fr;
+  margin-bottom: 4px;
+}
+.campo-id > label { font-size: 12px; }
+.campo-id input { width: 100%; text-align: left; padding-left: 4px; }
+.export-botoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-top: 8px;
+}
+.botao-mini {
+  width: auto;
+  height: 24px;
+  margin: 0;
+  font-size: 11.5px;
+}
+.export-aviso {
+  min-height: 15px;
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: #1a7f37;
+}
+.export-aviso.erro { color: #a61b1b; }
+
 .checa {
   display: flex;
   align-items: center;

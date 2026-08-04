@@ -195,6 +195,37 @@
         </div>
       </section>
 
+      <section class="grupo aberto">
+        <h2 class="cab"><span class="chev"></span>Identificação e exportação</h2>
+        <div class="corpo">
+          <div class="campo campo-id">
+            <label for="idProjeto">Projeto</label>
+            <input type="text" id="idProjeto" maxlength="60" placeholder="nome do projeto">
+          </div>
+          <div class="campo campo-id">
+            <label for="idElemento">Elemento</label>
+            <input type="text" id="idElemento" maxlength="60" placeholder="V1, P3…">
+          </div>
+          <div class="campo campo-id">
+            <label for="idResponsavel">Responsável</label>
+            <input type="text" id="idResponsavel" maxlength="60" placeholder="quem assina">
+          </div>
+          <div class="campo campo-id">
+            <label for="idRevisao">Revisão</label>
+            <input type="text" id="idRevisao" maxlength="12" placeholder="0">
+          </div>
+          <div class="export-botoes">
+            <button type="button" class="botao botao-mini" id="btBaixarImagem">Baixar imagem</button>
+            <button type="button" class="botao botao-mini" id="btCopiarImagem">Copiar imagem</button>
+          </div>
+          <p class="export-aviso" id="exportAviso" role="status"></p>
+          <p class="nota">
+            Gera um PNG da folha de resultados desta aba, com a identificação
+            acima — pronto para colar no memorial de cálculo.
+          </p>
+        </div>
+      </section>
+
     </aside>
 
     <main class="relatorio" id="relatorio">
@@ -258,6 +289,7 @@
 <script src="../js/cisalhamento.js"></script>
 <script src="../js/desenho-cisalhamento.js"></script>
 <script src="../js/app-cisalhamento.js"></script>
+<script src="../js/exportar.js"></script>
 <script src="../js/tema.js"></script>
 </body>
 </html>

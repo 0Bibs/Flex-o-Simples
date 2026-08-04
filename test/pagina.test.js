@@ -49,6 +49,7 @@ test('os scripts sao carregados na ordem de dependencia', () => {
     'js/desenho-equilibrio.js',
     'js/desenho-dominios.js',
     'js/app.js',
+    'js/exportar.js',
     'js/tema.js'
   ]);
 });
