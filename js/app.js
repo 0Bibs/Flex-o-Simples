@@ -107,6 +107,33 @@
     render(r, []);
   }
 
+  /* Linha de comparação das três áreas, na ordem pedida — adotada, mínima,
+     calculada — com o operador de cada par tirado dos valores como eles são
+     exibidos. Quando a mínima governa a cadeia sai crescente (≥ ... ≥);
+     quando quem manda é o cálculo, o sinal do meio vira "<" e é justamente
+     isso que mostra, de relance, que a mínima ficou para trás. */
+  function sinal(a, b) {
+    if (dec(a, 2) === dec(b, 2)) return '=';
+    return a > b ? '>' : '<';
+  }
+
+  function comparacao(r, usaMin) {
+    var minGoverna = usaMin && r.asMin > r.asCalc + 5e-3;
+    var termo = function (rot, v, forte) {
+      return (forte ? '<b>' : '') + 'A<sub>' + rot + '</sub> = ' + dec(v, 2) + ' cm²' +
+        (forte ? '</b>' : '');
+    };
+    return '<p>' +
+      termo('s,ado', r.As, true) +
+      ' <span class="op">' + sinal(r.As, r.asMin) + '</span> ' +
+      termo('s,mín', r.asMin, minGoverna) +
+      ' <span class="op">' + sinal(r.asMin, r.asCalc) + '</span> ' +
+      termo('s,calc', r.asCalc, !minGoverna) +
+      ' <span class="' + (minGoverna ? 'marca-min' : 'marca-ok') + '">' +
+      (minGoverna ? 'a armadura mínima governa' : 'o cálculo governa') +
+      '</span></p>';
+  }
+
   function render(r, erros) {
     var avisos = $('repAvisos');
     if (erros && erros.length) {
@@ -126,6 +153,20 @@
       '<p>x = ' + dec(r.x, 1) + ' cm</p>' +
       '<p>β<sub>x</sub> = x/d = ' + dec(r.betaX, 2) + '</p>' +
       '<p>Domínio ' + r.dominio + '</p>';
+
+    /* --- armadura: calculada, minima e adotada --- */
+    var usaMin = $('usarMin').checked;
+    $('repArmadura').innerHTML =
+      '<p>A<sub>s,calc</sub> = ' + dec(r.asCalc, 2) + ' cm² — do equilíbrio da seção</p>' +
+      '<p>A<sub>s,mín</sub> = ' + dec(r.asMin, 2) + ' cm² — ρ<sub>mín</sub> · A<sub>c</sub> = ' +
+        dec(r.rhoMin * 100, 3) + ' % · ' + dec(r.Ac, 0) + ' cm²' +
+        (usaMin ? '' : ' (não adotada)') + '</p>' +
+      '<p>A<sub>s,ado</sub> = ' + dec(r.As, 2) + ' cm²' +
+        (usaMin ? ' — máx(A<sub>s,calc</sub> ; A<sub>s,mín</sub>)' : ' = A<sub>s,calc</sub>') +
+        '</p>' +
+      "<p>A<sub>s</sub>′ = " + dec(r.Asl, 2) + ' cm² — armadura de compressão</p>';
+
+    $('repComparacao').innerHTML = comparacao(r, usaMin);
 
     /* --- desenhos --- */
     $('repEquilibrio').innerHTML = Eq.desenhar(r);

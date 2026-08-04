@@ -117,7 +117,20 @@ function el(tag, o) {
     offsetParent: o.oculto ? null : {},
     value: o.value,
     querySelector: () => o.svg || null,
-    querySelectorAll: () => (o.linhas || []).map((t) => ({ textContent: t }))
+    querySelectorAll: () => (o.linhas || []).map(paragrafo)
+  };
+}
+
+/* um <p> de mentira: 'A|s|,ado = 1,68' com o pipe marcando o subscrito */
+function paragrafo(fonte) {
+  const partes = String(fonte).split('|');
+  return {
+    tagName: 'P',
+    textContent: partes.join(''),
+    childNodes: partes.map((t, i) => (i % 2
+      ? { nodeType: 1, tagName: 'SUB', classList: { contains: () => false },
+          childNodes: [{ nodeType: 3, nodeValue: t }] }
+      : { nodeType: 3, nodeValue: t }))
   };
 }
 
@@ -153,7 +166,12 @@ function folhaFlexao(tema, id) {
   const filhos = [
     el('h2', { texto: 'Resultados' }),
     el('div', { id: 'repAvisos', filhos: [el('p', { classes: ['aviso'], texto: 'atenção' })] }),
-    el('div', { classes: ['bloco'], linhas: ['As = 1,68 cm2', 'x = 2,5 cm'] }),
+    el('div', { classes: ['bloco'], linhas: ['A|s| = 1,68 cm2', 'x = 2,5 cm'] }),
+    el('h2', { texto: 'Armadura' }),
+    el('div', { classes: ['bloco'], linhas: ['A|s,calc| = 1,68 cm²', 'A|s,mín| = 1,47 cm²',
+      'A|s,ado| = 1,68 cm²', 'A|s|′ = 0,00 cm²'] }),
+    el('div', { classes: ['bloco', 'destaque'],
+      linhas: ['A|s,ado| = 1,68 cm² > A|s,mín| = 1,47 cm² < A|s,calc| = 1,68 cm²'] }),
     el('h2', { texto: 'Equilíbrio' }),
     el('div', { classes: ['figura'], svg: svgFalso(FS.DesenhoEquilibrio.desenhar(r)) }),
     el('h2', { texto: 'Deformação/Domínios' }),
@@ -264,7 +282,8 @@ test('a folha traz a identificacao, o titulo e a norma', () => {
 test('a folha leva os desenhos e o texto do relatorio, mas nao o rodape da tela', () => {
   const svg = folhaFlexao('classico');
   assert.ok(svg.includes('class="dg"'), 'o desenho perdeu a classe que casa com o CSS');
-  assert.ok(svg.includes('As = 1,68 cm2'), 'faltou o texto dos resultados');
+  assert.ok(svg.includes('>A</tspan>') && svg.includes('>s</tspan>'),
+    'faltou o texto dos resultados');
   assert.ok(svg.includes('atenção'), 'faltou o aviso');
   assert.ok(!svg.includes('não deve sair na folha'), 'o rodapé da tela vazou para a folha');
   assert.ok(svg.includes('conferir por profissional habilitado'), 'faltou o rodapé da folha');
@@ -335,4 +354,42 @@ test('a exportacao nao usa nada de fora do navegador', () => {
   /* data: em vez de blob: no <img>, senao o canvas fica contaminado e o
      toBlob e recusado quando a pagina abre por duplo clique */
   assert.match(src, /img\.src = 'data:image\/svg\+xml/);
+});
+
+/* ------------------------------------------------------------------
+   4. armadura: as tres areas e a linha de comparacao */
+
+test('os subscritos do relatorio viram tspan na folha', () => {
+  const svg = folhaFlexao('classico');
+  /* 'A' na linha de base, 's,calc' rebaixado e menor, e a volta a base */
+  assert.match(svg, /<tspan xml:space="preserve">A<\/tspan><tspan dy="[\d.]+" font-size="[\d.]+"/,
+    'o subscrito não virou tspan rebaixado');
+  /* dentro de cada <text> montado pela exportacao (os tspans com
+     xml:space), o deslocamento acumulado tem de voltar a zero antes de
+     qualquer pedaco na linha de base — senao o resto da linha desce junto.
+     Os desenhos embutidos tem tspans proprios e ficam de fora da conta. */
+  for (const bloco of svg.matchAll(/<text\b[^>]*>((?:(?!<\/text>).)*)<\/text>/g)) {
+    const meus = [...bloco[1].matchAll(/<tspan([^>]*xml:space[^>]*)>/g)];
+    if (!meus.length) continue;
+    let nivel = 0;
+    for (const t of meus) {
+      const dy = Number((/dy="(-?[\d.]+)"/.exec(t[1]) || [0, 0])[1]);
+      const sub = /font-size/.test(t[1]);
+      nivel += dy;
+      assert.ok(sub ? nivel > 0 : Math.abs(nivel) < 1e-9,
+        `tspan fora da linha esperada (nível ${nivel.toFixed(2)}): ${t[1]}`);
+    }
+  }
+});
+
+test('a comparacao das areas sai destacada na folha', () => {
+  const svg = folhaFlexao('classico');
+  const linha = 'A' + 's,ado';   /* o texto chega quebrado em tspans */
+  assert.ok(svg.includes('s,ado') && svg.includes('s,mín') && svg.includes('s,calc'),
+    'faltaram as três áreas na folha: ' + linha);
+  /* a faixa de fundo do bloco de destaque */
+  assert.ok(svg.includes('fill="#f2f7fc"'), 'o bloco de destaque perdeu o fundo');
+  /* e o bloco de destaque nao vira duas colunas */
+  assert.ok(svg.includes('&gt;') || svg.includes('&lt;'),
+    'os operadores da comparação precisam sair escapados');
 });

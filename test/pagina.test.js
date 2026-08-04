@@ -34,9 +34,9 @@ test('todo id usado pela interface existe na pagina', () => {
 
 test('os ids de saida do relatorio existem', () => {
   const ids = idsDoHtml();
-  ['repResultados', 'repAvisos', 'repEquilibrio', 'repDominios', 'repGeral',
-    'repGeometria', 'repMateriais', 'repEsforcos', 'outRhoMin', 'outAsMin',
-    'outAsMax', 'outMdMin'].forEach(function (id) {
+  ['repResultados', 'repAvisos', 'repArmadura', 'repComparacao', 'repEquilibrio',
+    'repDominios', 'repGeral', 'repGeometria', 'repMateriais', 'repEsforcos',
+    'outRhoMin', 'outAsMin', 'outAsMax', 'outMdMin'].forEach(function (id) {
     assert.ok(ids.has(id), 'faltou #' + id);
   });
 });

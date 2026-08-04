@@ -131,9 +131,27 @@ cada tema, cada um com o seu `.ico`.
 
 A altura da seção é `h = d + d'`.
 
-**Painel direito (relatório)** — resultados (`As`, `As'`, `x`, `βx` e o domínio), desenho do
-equilíbrio da seção, diagrama dos domínios de deformação e a lista dos dados de entrada.
-Tudo é recalculado a cada alteração.
+**Painel direito (relatório)** — resultados (`As`, `As'`, `x`, `βx` e o domínio), a seção
+**Armadura**, desenho do equilíbrio da seção, diagrama dos domínios de deformação e a
+lista dos dados de entrada. Tudo é recalculado a cada alteração.
+
+A seção **Armadura** separa as três áreas que costumam ser confundidas — a calculada pelo
+equilíbrio, a mínima da NBR (ρmín · Ac) e a adotada, que é o máximo entre as duas — e
+fecha com uma linha de comparação, logo antes de *Equilíbrio*:
+
+```
+As,ado = 1,68 cm²  >  As,mín = 1,47 cm²  <  As,calc = 1,68 cm²   · o cálculo governa
+```
+
+A ordem dos termos é fixa (adotada, mínima, calculada) e **o operador de cada par vem dos
+valores**. Quando a mínima governa, a cadeia sai crescente (`=` e `>`); quando quem manda é
+o cálculo, o sinal do meio vira `<`, e é justamente isso que mostra de relance que a
+mínima ficou para trás. A etiqueta ao fim diz qual dos dois critérios governou.
+
+Os símbolos usam subscrito de verdade (`A`s,ado), na tela e também na imagem exportada.
+Não há motor de LaTeX: um (KaTeX, MathJax) custaria centenas de kB de biblioteca externa e
+quebraria a premissa de funcionar offline e por duplo clique, que é verificada por teste.
+Para as expressões desta ferramenta a diferença visual não compensaria.
 
 ## Exportar para o memorial de cálculo
 

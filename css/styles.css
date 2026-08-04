@@ -333,6 +333,22 @@ body.secao-t .campo.so-t { display: grid; }
   border-top: 1px solid #dcdcdc;
   margin: 20px 22px;
 }
+/* linha de comparação das áreas de armadura */
+.relatorio .destaque {
+  margin: 10px 22px 4px;
+  padding: 7px 12px;
+  border-left: 3px solid var(--acento);
+  background: #f7f9fb;
+}
+.relatorio .destaque p { margin: 0; font-size: 15.5px; }
+.relatorio .destaque .op {
+  display: inline-block;
+  min-width: 15px;
+  text-align: center;
+  color: #6b6b6b;
+}
+html[data-tema="corporativo"] .relatorio .destaque { background: #faf6ea; }
+
 .rodape { margin: 0 22px; font-size: 11.5px; color: #9a9a9a; }
 .figura { margin: 4px 12px 0; }
 .figura svg { display: block; width: 100%; max-width: 720px; height: auto; }

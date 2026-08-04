@@ -91,6 +91,69 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
   function n(v) { return Math.round(v * 100) / 100; }
+  /* Uma linha do relatorio vira uma lista de pedacos, para o SVG poder
+     repetir os subscritos e os destaques que a pagina mostra — 'As,ado'
+     escrito com o 's,ado' rebaixado le muito melhor num memorial do que o
+     texto achatado. */
+  function segmentos(p) {
+    if (!p.childNodes) {
+      var plano = (p.textContent || '').trim();
+      return plano ? [{ t: plano }] : [];
+    }
+    var out = [];
+    (function anda(no, sub, forte, marca) {
+      Array.prototype.forEach.call(no.childNodes, function (f) {
+        if (f.nodeType === 3) {
+          if (f.nodeValue) out.push({ t: f.nodeValue, sub: sub, forte: forte, marca: marca });
+          return;
+        }
+        if (f.nodeType !== 1) return;
+        var cl = f.classList;
+        anda(f, sub || f.tagName === 'SUB', forte || f.tagName === 'B' ||
+          f.tagName === 'STRONG',
+          marca || (cl && (cl.contains('marca-min') || cl.contains('marca-ok'))
+            ? (cl.contains('marca-min') ? 'min' : 'ok') : marca));
+      });
+    })(p, false, false, null);
+    /* junta os espacos das bordas, que vem da indentacao do HTML */
+    while (out.length && !out[0].t.trim()) out.shift();
+    while (out.length && !out[out.length - 1].t.trim()) out.pop();
+    if (out.length) {
+      out[0] = Object.assign({}, out[0], { t: out[0].t.replace(/^\s+/, '') });
+      var u = out.length - 1;
+      out[u] = Object.assign({}, out[u], { t: out[u].t.replace(/\s+$/, '') });
+    }
+    return out;
+  }
+
+  function planoDe(segs) {
+    return segs.map(function (g) { return g.t; }).join('');
+  }
+
+  var CORES_MARCA = { min: '#8a6300', ok: '#1a7f37' };
+
+  /* Monta o <text> com os pedacos. O dy de um tspan desloca a posicao
+     corrente e nao volta sozinho, entao cada troca de nivel emite o
+     deslocamento relativo ao pedaco anterior. */
+  function textoRico(x, y, tam, cor, segs, extra) {
+    var s = '<text x="' + n(x) + '" y="' + n(y) + '" font-size="' + tam + '" fill="' + cor +
+      '"' + (extra || '') + '>';
+    var nivel = 0;
+    segs.forEach(function (g) {
+      var alvo = g.sub ? 1 : 0;
+      var atr = '';
+      if (alvo !== nivel) { atr += ' dy="' + n((alvo - nivel) * tam * 0.24) + '"'; nivel = alvo; }
+      if (g.sub) atr += ' font-size="' + n(tam * 0.74) + '"';
+      if (g.forte) atr += ' font-weight="600"';
+      /* na tela a marca de quem governa e uma pastilha; aqui, texto colorido
+         depois de um separador, que e o que a folha tem de equivalente */
+      if (g.marca) atr += ' fill="' + CORES_MARCA[g.marca] + '"';
+      s += '<tspan' + atr + ' xml:space="preserve">' +
+        esc(g.marca ? ' · ' + g.t.trim() : g.t) + '</tspan>';
+    });
+    return s + '</text>';
+  }
+
   /* Largura de um texto, para decidir a divisao em colunas. O canvas mede
      com a mesma fonte da folha, entao o resultado e exato; a estimativa por
      caractere so entra quando nao ha canvas (nos testes, fora do navegador). */
@@ -183,10 +246,13 @@
       if (cl.contains('bloco')) {
         var linhas = [];
         Array.prototype.forEach.call(el.querySelectorAll('p'), function (p) {
-          var t = p.textContent.trim();
-          if (t) linhas.push(t);
+          var segs = segmentos(p);
+          if (segs.length) linhas.push(segs);
         });
-        if (linhas.length) saida.blocos.push({ tipo: 'texto', linhas: linhas });
+        if (linhas.length) {
+          saida.blocos.push({ tipo: cl.contains('destaque') ? 'destaque' : 'texto',
+            linhas: linhas });
+        }
         return;
       }
       /* qualquer outro contêiner (os agrupamentos por modo do cisalhamento,
@@ -276,22 +342,36 @@
            unica linha comprida jogaria o bloco inteiro para uma coluna so. */
         var esq = MARG + 15;
         var util = LARG - MARG - esq;
+        var planas = b.linhas.map(planoDe);
         var porCol = Math.ceil(b.linhas.length / 2);
         var x2 = 0;
         if (b.linhas.length >= 4) {
-          var l1 = maiorLargura(b.linhas.slice(0, porCol), CORPO);
-          var l2 = maiorLargura(b.linhas.slice(porCol), CORPO);
+          var l1 = maiorLargura(planas.slice(0, porCol), CORPO);
+          var l2 = maiorLargura(planas.slice(porCol), CORPO);
           if (l1 + 30 + l2 <= util) {
             x2 = Math.min(Math.max(l1 + 30, util * 0.48), util - l2);
           }
         }
         if (!x2) porCol = b.linhas.length;
         y += 12;
-        b.linhas.forEach(function (t, i) {
+        b.linhas.forEach(function (segs, i) {
           var col = Math.floor(i / porCol);
-          corpo += txt(esq + col * x2, y + (i % porCol) * 25 + 16, CORPO, '#1a1a1a', t);
+          corpo += textoRico(esq + col * x2, y + (i % porCol) * 25 + 16, CORPO, '#1a1a1a', segs);
         });
         y += porCol * 25 + 8;
+      } else if (b.tipo === 'destaque') {
+        /* a comparacao das areas de armadura: uma linha so, em evidencia */
+        var alt = b.linhas.length * 25 + 14;
+        y += 14;
+        corpo += '<rect x="' + MARG + '" y="' + n(y) + '" width="' + (LARG - 2 * MARG) +
+          '" height="' + alt + '" fill="' + (tema === 'corporativo' ? '#faf6ea' : '#f2f7fc') +
+          '"/>';
+        corpo += '<rect x="' + MARG + '" y="' + n(y) + '" width="3.5" height="' + alt +
+          '" fill="' + c.acento + '"/>';
+        b.linhas.forEach(function (segs, i) {
+          corpo += textoRico(MARG + 15, y + 25 + i * 25, CORPO, '#1a1a1a', segs);
+        });
+        y += alt + 8;
       } else if (b.tipo === 'aviso') {
         y += 14;
         corpo += '<rect x="' + MARG + '" y="' + y + '" width="' + (LARG - 2 * MARG) +
