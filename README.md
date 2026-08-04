@@ -127,7 +127,7 @@ cada tema, cada um com o seu `.ico`.
 | Armaduras | `As` por área, por `n × Ø` ou por `Ø c/ espaçamento`; `As'` |
 | Armadura mínima | ρmín, As,mín, As,máx e Md,mín; opção de adotar a mínima quando governar |
 | Armadura dupla | permitir ou não, `d'` e o limite `βx,lim` |
-| Identificação e exportação | projeto, elemento, responsável e revisão; botões de exportar a folha de resultados como imagem |
+| Identificação e exportação | projeto e elemento; botões de exportar a folha de resultados como imagem |
 
 A altura da seção é `h = d + d'`.
 
@@ -158,14 +158,22 @@ Para as expressões desta ferramenta a diferença visual não compensaria.
 O grupo **Identificação e exportação**, no fim do painel, gera uma **folha de resultados em
 PNG** pronta para colar no corpo do documento:
 
-- **Baixar imagem** salva o arquivo (`flexo-simples-<elemento>-r<revisão>.png`);
+- **Baixar imagem** salva o arquivo (`flexo-simples-<elemento>.png`);
 - **Copiar imagem** põe o PNG na área de transferência — no Word basta `Ctrl+V`.
 
 A folha sai da aba em que você está e traz exatamente o que está no relatório naquele
 momento: os blocos escondidos pelo modo atual (por exemplo, torção quando só o cortante
-está ligado) ficam de fora. No topo vai um quadro de **identificação** com projeto,
-elemento, responsável, revisão, data e a norma adotada. Os quatro campos ficam guardados
-no navegador, então continuam preenchidos na próxima vez.
+está ligado) ficam de fora. No topo vai um quadro de **identificação** com projeto e
+elemento — os dois campos ficam guardados no navegador, então continuam preenchidos na
+próxima vez — e, logo abaixo, a frase que diz o que aquela folha dimensiona:
+
+| Ferramenta | Frase |
+|---|---|
+| Flexão | Dimensionamento armaduras longitudinais em concreto armado. |
+| Cortante/Torção | Dimensionamento de armaduras transversais em concreto armado. |
+
+Cada página declara a sua em `data-descricao`, no próprio `<main id="relatorio">`: para
+mudar o texto basta editar o HTML, sem tocar no código da exportação.
 
 O que a folha **não** é: um *print* da tela. O painel de entrada e a moldura da janela
 ficam de fora, os dados são reagrupados em duas colunas e os desenhos são recortados no

@@ -176,7 +176,7 @@
   }
 
   /* ------------------------------------------------ identificacao */
-  var CAMPOS = ['projeto', 'elemento', 'responsavel', 'revisao'];
+  var CAMPOS = ['projeto', 'elemento'];
 
   function campoId(c) {
     return document.getElementById('id' + c.charAt(0).toUpperCase() + c.slice(1));
@@ -287,9 +287,6 @@
     var tema = document.documentElement.getAttribute('data-tema') === 'corporativo'
       ? 'corporativo' : 'classico';
     var c = TEMAS[tema];
-    var selNorma = document.getElementById('norma');
-    var norma = selNorma ? selNorma.value : '';
-
     var corpo = '';
     var y = 0;
 
@@ -306,11 +303,7 @@
     /* --- identificacao --- */
     var linhasId = [
       ['Projeto', id.projeto || '—'],
-      ['Elemento', id.elemento || '—'],
-      ['Responsável', id.responsavel || '—'],
-      ['Revisão', id.revisao || '—'],
-      ['Data', dataDeHoje()],
-      ['Norma', norma ? 'ABNT NBR 6118:' + norma : '—']
+      ['Elemento', id.elemento || '—']
     ];
     var altId = 46 + Math.ceil(linhasId.length / 2) * 27;
     corpo += '<rect x="' + MARG + '" y="' + (y + 20) + '" width="' + (LARG - 2 * MARG) +
@@ -324,7 +317,17 @@
       corpo += txt(xi, yi, 14.5, '#7a7a7a', par[0]);
       corpo += txt(xi + 96, yi, 15, '#1a1a1a', par[1], ' font-weight="600"');
     });
-    y += 20 + altId + 22;
+    y += 20 + altId;
+
+    /* --- o que a folha dimensiona: cada pagina declara a sua frase --- */
+    var rel = document.getElementById('relatorio');
+    var descricao = rel && rel.getAttribute ? rel.getAttribute('data-descricao') : '';
+    if (descricao) {
+      y += 30;
+      corpo += txt(MARG, y, 15, '#5a5a5a', descricao);
+      y += 4;
+    }
+    y += 18;
 
     /* --- corpo do relatorio --- */
     dados.blocos.forEach(function (b) {
@@ -446,7 +449,7 @@
     var id = lerIdentificacao();
     var partes = ['flexo-simples'];
     if (id.elemento) partes.push(id.elemento);
-    if (id.revisao) partes.push('r' + id.revisao);
+    else if (id.projeto) partes.push(id.projeto);
     var nome = partes.join('-').normalize('NFD').replace(/[̀-ͯ]/g, '');
     return nome.replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '')
       .replace(/-+/g, '-').toLowerCase() + '.png';

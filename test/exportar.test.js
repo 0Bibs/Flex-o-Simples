@@ -140,6 +140,11 @@ function documentoFalso(tema, titulo, filhos, id) {
   const mapa = { relatorio: el('main', { id: 'relatorio', filhos: filhos }) };
   for (const k of Object.keys(campos)) mapa[k] = el('input', { value: campos[k] });
   mapa.relatorio.children = [el('h1', { texto: titulo })].concat(filhos);
+  /* a frase que cada pagina declara sai do HTML de verdade */
+  const pagina = titulo.startsWith('Flexão') ? 'index.html' : 'cisalhamento/index.html';
+  const descricao = (/data-descricao="([^"]+)"/
+    .exec(fs.readFileSync(path.join(raiz, pagina), 'utf8')) || [])[1] || '';
+  mapa.relatorio.getAttribute = (a) => (a === 'data-descricao' ? descricao : null);
   return {
     documentElement: { getAttribute: () => tema },
     getElementById: (i) => mapa[i] || null
@@ -265,18 +270,36 @@ test('o texto da folha e grande o bastante para ser lido depois de colado', () =
   assert.ok(larg <= 900, `folha larga demais (${larg}): o Word encolhe tudo`);
 });
 
-test('a folha traz a identificacao, o titulo e a norma', () => {
-  const svg = folhaFlexao('classico', {
-    idProjeto: 'Plataforma P-99', idElemento: 'V12', idResponsavel: 'Eng. Fulano',
-    idRevisao: '2', norma: '2023'
-  });
+test('a folha traz a identificacao e o titulo', () => {
+  const svg = folhaFlexao('classico', { idProjeto: 'Plataforma P-99', idElemento: 'V12' });
   assert.ok(svg.includes('IDENTIFICAÇÃO'));
-  for (const t of ['Plataforma P-99', 'V12', 'Eng. Fulano', 'ABNT NBR 6118:2023',
-    'Flexão simples', 'Projeto', 'Elemento', 'Responsável', 'Revisão', 'Data']) {
+  for (const t of ['Plataforma P-99', 'V12', 'Flexão simples', 'Projeto', 'Elemento']) {
     assert.ok(svg.includes(t), 'faltou na folha: ' + t);
+  }
+  /* o quadro ficou so com projeto e elemento */
+  for (const t of ['Responsável', 'Revisão', '>Data<', 'ABNT NBR 6118:']) {
+    assert.ok(!svg.includes(t), 'saiu do quadro mas continua na folha: ' + t);
   }
   /* campos em branco viram travessao, e nao 'undefined' */
   assert.ok(folhaFlexao('classico').includes('—'));
+});
+
+test('cada ferramenta declara na folha o que ela dimensiona', () => {
+  assert.ok(folhaFlexao('classico').includes(
+    'Dimensionamento armaduras longitudinais em concreto armado.'));
+  assert.ok(folhaCisalhamento('classico').includes(
+    'Dimensionamento de armaduras transversais em concreto armado.'));
+});
+
+test('a frase de cada ferramenta vem do proprio HTML, e nao do codigo', () => {
+  const frases = {
+    'index.html': 'Dimensionamento armaduras longitudinais em concreto armado.',
+    'cisalhamento/index.html': 'Dimensionamento de armaduras transversais em concreto armado.'
+  };
+  for (const [pagina, frase] of Object.entries(frases)) {
+    const h = fs.readFileSync(path.join(raiz, pagina), 'utf8');
+    assert.ok(h.includes('data-descricao="' + frase + '"'), pagina + ': faltou a frase');
+  }
 });
 
 test('a folha leva os desenhos e o texto do relatorio, mas nao o rodape da tela', () => {
@@ -318,9 +341,9 @@ test('o texto que vem da tela e escapado antes de entrar no SVG', () => {
 
 test('o nome do arquivo sai limpo a partir da identificacao', () => {
   const doc = documentoFalso('classico', 'Flexão simples', [],
-    { idElemento: 'Viga V-12 (apoio)', idRevisao: '3' });
+    { idElemento: 'Viga V-12 (apoio)' });
   const nome = comDocumento(doc, Exp.nomeArquivo);
-  assert.strictEqual(nome, 'flexo-simples-viga-v-12-apoio-r3.png');
+  assert.strictEqual(nome, 'flexo-simples-viga-v-12-apoio.png');
 
   const vazio = comDocumento(documentoFalso('classico', 'x', []), Exp.nomeArquivo);
   assert.strictEqual(vazio, 'flexo-simples.png');
@@ -332,7 +355,7 @@ test('o nome do arquivo sai limpo a partir da identificacao', () => {
 test('as duas paginas tem os campos de identificacao e os botoes', () => {
   for (const pagina of ['index.html', 'cisalhamento/index.html']) {
     const h = fs.readFileSync(path.join(raiz, pagina), 'utf8');
-    for (const id of ['idProjeto', 'idElemento', 'idResponsavel', 'idRevisao',
+    for (const id of ['idProjeto', 'idElemento',
       'btBaixarImagem', 'btCopiarImagem', 'exportAviso']) {
       assert.ok(h.includes('id="' + id + '"'), pagina + ': faltou #' + id);
     }
