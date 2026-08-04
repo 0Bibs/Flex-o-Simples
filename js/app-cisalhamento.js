@@ -55,13 +55,25 @@
   }
 
   /* ------------------------------------------------ render */
+  /* Escreve num campo do relatorio se ele existir: com um service worker
+     servindo pagina e script de versoes diferentes, um id novo pode faltar
+     no HTML em cache, e um id ausente nao pode derrubar o relatorio todo. */
+  function escreve(id, html) {
+    var e = $(id);
+    if (e) e.innerHTML = html;
+  }
+  function escreveTexto(id, texto) {
+    var e = $(id);
+    if (e) e.textContent = texto;
+  }
+
   function calcular() {
     var e = entrada();
     var problemas = erros(e);
     if (problemas.length) {
-      $('repAvisos').innerHTML = problemas.map(function (m) {
+      escreve('repAvisos', problemas.map(function (m) {
         return '<p class="aviso">' + m + '</p>';
-      }).join('');
+      }).join(''));
       return;
     }
     var r = Cis.calcular(e);
@@ -75,17 +87,17 @@
     document.body.classList.toggle('modo-t', comT);
     document.body.classList.toggle('modo-vt', comV && comT);
 
-    $('titulo').textContent = comV && comT ? 'Cortante + torção'
-      : (comT ? 'Torção' : 'Cortante');
+    escreveTexto('titulo', comV && comT ? 'Cortante + torção'
+      : (comT ? 'Torção' : 'Cortante'));
 
-    $('repAvisos').innerHTML = r.avisos.map(function (m) {
+    escreve('repAvisos', r.avisos.map(function (m) {
       return '<p class="aviso">' + m + '</p>';
-    }).join('');
+    }).join(''));
 
     if (comV) {
       var V = r.cortante;
-      $('repCortante').innerHTML =
-        '<p>A<sub>sw,nec</sub> = ' + dec(V.aswNecM, 2) + ' cm²/m (' + r.nRamos + 'R)' +
+      escreve('repCortante',
+      '<p>A<sub>sw,nec</sub> = ' + dec(V.aswNecM, 2) + ' cm²/m (' + r.nRamos + 'R)' +
         (V.minimaGoverna ? ' <span class="marca-min">mínima governa</span>' : '') + '</p>' +
         '<p>A<sub>sw,mín</sub> = ' + dec(V.aswMinM, 2) + ' cm²/m</p>' +
         '<p>A<sub>sw,calc</sub> = ' + dec(V.aswCalcM, 2) + ' cm²/m</p>' +
@@ -93,13 +105,13 @@
         '<p>V<sub>c</sub> = ' + dec(V.VcTf, 2) + ' tf</p>' +
         '<p>V<sub>sw</sub> = ' + dec(V.VswTf, 2) + ' tf</p>' +
         (V.VRd3Tf !== undefined
-          ? '<p>V<sub>Rd3</sub> = ' + dec(V.VRd3Tf, 2) + ' tf (estribo adotado)</p>' : '');
+          ? '<p>V<sub>Rd3</sub> = ' + dec(V.VRd3Tf, 2) + ' tf (estribo adotado)</p>' : ''));
     }
 
     if (comT) {
       var T = r.torcao;
-      $('repTorcao').innerHTML =
-        '<p>A<sub>90,nec</sub> = ' + dec(T.a90NecM, 2) + ' cm²/m (1R)' +
+      escreve('repTorcao',
+      '<p>A<sub>90,nec</sub> = ' + dec(T.a90NecM, 2) + ' cm²/m (1R)' +
         (T.minimaGoverna ? ' <span class="marca-min">mínima governa</span>' : '') + '</p>' +
         '<p>A<sub>90,mín</sub> = ' + dec(T.a90MinM, 2) + ' cm²/m (1R)</p>' +
         '<p>A<sub>sl,nec</sub> = ' + dec(T.aslNecM, 2) + ' cm²/m de perímetro</p>' +
@@ -111,46 +123,46 @@
         '<p>T<sub>Rd3</sub> = ' + dec(T.TRd3Tfm, 2) + ' tfm</p>' +
         '<p>T<sub>Rd4</sub> = ' + dec(T.TRd4Tfm, 2) + ' tfm</p>' +
         '<p>h<sub>e</sub> = ' + dec(T.he, 1) + ' cm · b<sub>nuc</sub> = ' +
-        dec(T.bnuc, 1) + ' cm · h<sub>nuc</sub> = ' + dec(T.hnuc, 1) + ' cm</p>';
+        dec(T.bnuc, 1) + ' cm · h<sub>nuc</sub> = ' + dec(T.hnuc, 1) + ' cm</p>');
     }
 
     if (comV && comT) {
-      $('repInteracao').innerHTML =
-        '<p>(V<sub>Sd</sub>/V<sub>Rd2</sub>) + (T<sub>Sd</sub>/T<sub>Rd2</sub>) = ' +
+      escreve('repInteracao',
+      '<p>(V<sub>Sd</sub>/V<sub>Rd2</sub>) + (T<sub>Sd</sub>/T<sub>Rd2</sub>) = ' +
         dec(r.interacao, 2) +
         (r.interacao > 1 ? ' <span class="marca-ruim">acima do limite</span>'
-          : ' <span class="marca-ok">≤ 1,00</span>') + '</p>';
+          : ' <span class="marca-ok">≤ 1,00</span>') + '</p>');
     }
 
-    $('repEstribos').innerHTML =
+    escreve('repEstribos',
       '<p>Ø ' + dec(r.diamEstribo, 1) + ' mm c/ <strong>' + dec(r.sAdotado, 1) +
       ' cm</strong> (' + r.nRamos + ' ramos)</p>' +
       '<p>Espaçamento exato: ' + dec(r.sExato, 1) + ' cm</p>' +
       '<p>s<sub>máx</sub> = ' + dec(r.sMax, 1) + ' cm · s<sub>t,máx</sub> = ' +
       dec(r.stMax, 1) + ' cm (item 18.3.3.2)</p>' +
-      '<p>Demanda por ramo: ' + dec(r.demandaPorRamoM, 2) + ' cm²/m</p>';
-    $('outS').textContent = dec(r.sAdotado, 1);
+      '<p>Demanda por ramo: ' + dec(r.demandaPorRamoM, 2) + ' cm²/m</p>');
+    escreveTexto('outS', dec(r.sAdotado, 1));
 
     /* desenhos */
-    $('repSecao').innerHTML = Dg.secao(r);
-    if (comT) $('repVazada').innerHTML = Dg.vazada(r);
-    $('repBielas').innerHTML = Dg.bielas(r);
+    escreve('repSecao', Dg.secao(r));
+    if (comT) escreve('repVazada', Dg.vazada(r));
+    escreve('repBielas', Dg.bielas(r));
 
     /* dados */
-    $('repGeral').innerHTML =
+    escreve('repGeral',
       '<p>Norma utilizada: NBR-6118:' + $('norma').value + '</p>' +
       '<p>Modelo de cálculo: ' + (r.modelo === 'II' ? 'II (biela a ' + num(r.theta) + '°)'
         : 'I (biela a 45°)') + '</p>' +
-      '<p>Inclinação do estribo: α = ' + num(r.alpha) + '°</p>';
+      '<p>Inclinação do estribo: α = ' + num(r.alpha) + '°</p>');
 
-    $('repGeometria').innerHTML =
+    escreve('repGeometria',
       '<p>b<sub>w</sub> = ' + num(r.bw) + ' cm</p>' +
       '<p>b<sub>w,mín</sub> = ' + num(r.bwMin) + ' cm</p>' +
       '<p>h = ' + num(r.h) + ' cm</p>' +
       '<p>d = ' + num(r.d) + ' cm</p>' +
-      (comT ? '<p>c<sub>1</sub> = ' + num(r.c1) + ' cm</p>' : '');
+      (comT ? '<p>c<sub>1</sub> = ' + num(r.c1) + ' cm</p>' : ''));
 
-    $('repMateriais').innerHTML =
+    escreve('repMateriais',
       '<p>f<sub>ck</sub> = ' + num(r.fck) + ' MPa</p>' +
       '<p>f<sub>ywk</sub> = ' + num(r.fyk) + ' MPa</p>' +
       '<p>γ<sub>c</sub> = ' + dec(r.gammaC, 2) + '</p>' +
@@ -158,12 +170,12 @@
       '<p>f<sub>ywd</sub> = ' + dec(r.fywdMPa, 1) + ' MPa' +
       (r.limitadoFywd ? ' (limitado a ' + Cis.FYWD_MAX + ' MPa)' : '') + '</p>' +
       '<p>f<sub>ctm</sub> = ' + dec(r.fctm, 2) + ' MPa · f<sub>ctd</sub> = ' +
-      dec(r.fctd, 2) + ' MPa</p>';
+      dec(r.fctd, 2) + ' MPa</p>');
 
-    $('repEsforcos').innerHTML =
+    escreve('repEsforcos',
       (comV ? '<p>V<sub>Sk</sub> = ' + dec(r.cortante.VskTf, 2) + ' tf</p>' : '') +
       (comT ? '<p>T<sub>Sk</sub> = ' + dec(r.torcao.TskTfm, 2) + ' tfm</p>' : '') +
-      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>';
+      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>');
 
     $('gammaFT').textContent = dec(r.gammaF, 2);
   }

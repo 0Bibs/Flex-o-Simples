@@ -319,6 +319,10 @@ Os arquivos de `js/` funcionam tanto no navegador quanto no Node, sem transpila�
   não uma repetição do esforço solicitante.
 - Verificações de fissuração, flecha, ancoragem e detalhamento das barras **não** fazem
   parte destas ferramentas.
+- O nome do cache do service worker (`sw.js`) carrega a impressão digital do conteúdo, e
+  `test/pagina.test.js` falha — dizendo o valor certo — quando ele fica para trás. Sem isso
+  o navegador pode servir a página de um deploy e o script de outro, e o relatório aparece
+  pela metade.
 - **Copiar imagem** depende da API de área de transferência do navegador, que só funciona
   em `https://` ou `localhost`. Com a página aberta por duplo clique (`file://`) use
   **Baixar imagem** — a geração da folha em si funciona nos dois casos.

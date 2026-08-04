@@ -134,29 +134,41 @@
       '</span></p>';
   }
 
+  /* Escreve num campo do relatorio se ele existir. Parece zelo demais, mas
+     nao e: com um service worker servindo pagina e script de versoes
+     diferentes, um id novo pode faltar no HTML em cache. Antes disso um id
+     ausente derrubava o render inteiro, e o relatorio ficava so com os
+     titulos — quebra muito pior do que a secao que faltava. */
+  function escreve(id, html) {
+    var e = $(id);
+    if (e) e.innerHTML = html;
+  }
+  function escreveTexto(id, texto) {
+    var e = $(id);
+    if (e) e.textContent = texto;
+  }
+
   function render(r, erros) {
-    var avisos = $('repAvisos');
     if (erros && erros.length) {
-      avisos.innerHTML = erros.map(function (m) {
+      escreve('repAvisos', erros.map(function (m) {
         return '<p class="aviso">' + m + '</p>';
-      }).join('');
+      }).join(''));
       return;
     }
-    avisos.innerHTML = (r.avisos || []).map(function (m) {
+    escreve('repAvisos', (r.avisos || []).map(function (m) {
       return '<p class="aviso">' + m + '</p>';
-    }).join('');
+    }).join(''));
 
     /* --- resultados --- */
-    $('repResultados').innerHTML =
-      '<p>A<sub>s</sub> = ' + dec(r.As, 2) + ' cm2</p>' +
+    escreve('repResultados', '<p>A<sub>s</sub> = ' + dec(r.As, 2) + ' cm2</p>' +
       '<p>A<sub>s</sub>′ = ' + dec(r.Asl, 2) + ' cm2</p>' +
       '<p>x = ' + dec(r.x, 1) + ' cm</p>' +
       '<p>β<sub>x</sub> = x/d = ' + dec(r.betaX, 2) + '</p>' +
-      '<p>Domínio ' + r.dominio + '</p>';
+      '<p>Domínio ' + r.dominio + '</p>');
 
     /* --- armadura: calculada, minima e adotada --- */
     var usaMin = $('usarMin').checked;
-    $('repArmadura').innerHTML =
+    escreve('repArmadura',
       '<p>A<sub>s,calc</sub> = ' + dec(r.asCalc, 2) + ' cm² — do equilíbrio da seção</p>' +
       '<p>A<sub>s,mín</sub> = ' + dec(r.asMin, 2) + ' cm² — ρ<sub>mín</sub> · A<sub>c</sub> = ' +
         dec(r.rhoMin * 100, 3) + ' % · ' + dec(r.Ac, 0) + ' cm²' +
@@ -164,17 +176,16 @@
       '<p>A<sub>s,ado</sub> = ' + dec(r.As, 2) + ' cm²' +
         (usaMin ? ' — máx(A<sub>s,calc</sub> ; A<sub>s,mín</sub>)' : ' = A<sub>s,calc</sub>') +
         '</p>' +
-      "<p>A<sub>s</sub>′ = " + dec(r.Asl, 2) + ' cm² — armadura de compressão</p>';
+      "<p>A<sub>s</sub>′ = " + dec(r.Asl, 2) + ' cm² — armadura de compressão</p>');
 
-    $('repComparacao').innerHTML = comparacao(r, usaMin);
+    escreve('repComparacao', comparacao(r, usaMin));
 
     /* --- desenhos --- */
-    $('repEquilibrio').innerHTML = Eq.desenhar(r);
-    $('repDominios').innerHTML = Dom.desenhar(r);
+    escreve('repEquilibrio', Eq.desenhar(r));
+    escreve('repDominios', Dom.desenhar(r));
 
     /* --- dados --- */
-    $('repGeral').innerHTML =
-      '<p>Norma utilizada: NBR-6118:' + $('norma').value + '</p>';
+    escreve('repGeral', '<p>Norma utilizada: NBR-6118:' + $('norma').value + '</p>');
 
     var geo = '<p>b<sub>w</sub> = ' + num(r.bw) + ' cm</p>';
     if (r.secaoT) {
@@ -184,24 +195,22 @@
     geo += '<p>h = ' + num(r.h) + ' cm</p>' +
       '<p>d = ' + num(r.d) + ' cm</p>' +
       "<p>d' = " + num(r.dl) + ' cm</p>';
-    $('repGeometria').innerHTML = geo;
+    escreve('repGeometria', geo);
 
-    $('repMateriais').innerHTML =
-      '<p>f<sub>ck</sub> = ' + num(r.fck) + ' MPa</p>' +
+    escreve('repMateriais', '<p>f<sub>ck</sub> = ' + num(r.fck) + ' MPa</p>' +
       '<p>f<sub>yk</sub> = ' + num(r.fyk) + ' MPa (tipo ' + r.tipoAco + ')</p>' +
       '<p>γ<sub>c</sub> = ' + dec(r.gammaC, 2) + '</p>' +
       '<p>γ<sub>s</sub> = ' + dec(r.gammaS, 2) + '</p>' +
-      '<p>f<sub>ctk</sub> = ' + dec(r.fctkSup, 2) + ' MPa</p>';
+      '<p>f<sub>ctk</sub> = ' + dec(r.fctkSup, 2) + ' MPa</p>');
 
-    $('repEsforcos').innerHTML =
-      '<p>M<sub>sk</sub> = ' + dec(r.MsdTfm / (r.gammaF || 1), 2) + ' tfm</p>' +
-      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>';
+    escreve('repEsforcos', '<p>M<sub>sk</sub> = ' + dec(r.MsdTfm / (r.gammaF || 1), 2) + ' tfm</p>' +
+      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>');
 
     /* --- painel de armadura minima --- */
-    $('outRhoMin').textContent = dec(r.rhoMin * 100, 3);
-    $('outAsMin').textContent = dec(r.asMin, 2);
-    $('outAsMax').textContent = dec(r.asMax, 2);
-    $('outMdMin').textContent = dec(r.MdMinTfm, 2);
+    escreveTexto('outRhoMin', dec(r.rhoMin * 100, 3));
+    escreveTexto('outAsMin', dec(r.asMin, 2));
+    escreveTexto('outAsMax', dec(r.asMax, 2));
+    escreveTexto('outMdMin', dec(r.MdMinTfm, 2));
   }
 
   /* ------------------------------------------------ ligacoes da interface */

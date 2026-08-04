@@ -176,6 +176,28 @@ test('o service worker guarda em cache tudo que a pagina usa', () => {
   }
 });
 
+/* O service worker revalida cada arquivo por conta propria. Se o nome do
+   cache nao mudar quando o conteudo muda, o navegador pode acabar servindo
+   pagina de um deploy e script de outro — e o relatorio aparece pela
+   metade. Amarrar o nome ao conteudo tira isso das maos de quem lembra. */
+test('o nome do cache acompanha o conteudo dos arquivos', () => {
+  const crypto = require('node:crypto');
+  const lista = sw.slice(sw.indexOf('var ARQUIVOS'), sw.indexOf('];', sw.indexOf('var ARQUIVOS')));
+  const arquivos = [...new Set([...lista.matchAll(/'([^']+)'/g)].map((m) => m[1]))]
+    .filter((a) => !a.endsWith('/'))
+    .sort();
+
+  const h = crypto.createHash('sha1');
+  for (const a of arquivos) {
+    h.update(a); h.update('\0');
+    h.update(fs.readFileSync(path.join(raiz, a))); h.update('\0');
+  }
+  const esperado = 'flexo-simples-' + h.digest('hex').slice(0, 10);
+  const atual = (/var CACHE = '([^']+)'/.exec(sw) || [])[1];
+  assert.strictEqual(atual, esperado,
+    `o cache ficou para tras. Em sw.js troque por:\n  var CACHE = '${esperado}';`);
+});
+
 test('o registro do service worker so acontece sob http/https', () => {
   assert.match(app, /serviceWorker' in navigator/);
   assert.match(app, /location\.protocol/);
