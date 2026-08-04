@@ -15,9 +15,17 @@
 
   var FS = (root.FS = root.FS || {});
 
-  var LARG = 1120;              /* largura da folha, em unidades do SVG */
-  var MARG = 48;
-  var LARG_FIG = 760;           /* figuras nao ocupam a folha inteira */
+  /* A folha e estreita de proposito. Colada no Word, a imagem e reduzida
+     ate a largura util da pagina (~16 cm), e o que decide se o texto fica
+     legivel nao e o tamanho da fonte em si, mas a razao entre ela e a
+     largura da folha. Com 760 unidades e corpo em 16, o texto sai por volta
+     de 9,5 pt no documento. Alargar a folha encolhe tudo de novo. */
+  var LARG = 760;               /* largura da folha, em unidades do SVG */
+  var MARG = 30;
+  var CORPO = 16;               /* tamanho das linhas do relatorio */
+  var INSET_FIG = 10;           /* respiro lateral das figuras */
+  var FONTE_DESENHO = 12;       /* '.dg text' — a legenda dentro dos desenhos */
+  var ALVO_LEGENDA = 15;        /* como ela deve sair, em unidades da folha */
   var ESCALA = 2;               /* rasteriza em 2x: fica nitido impresso */
   var CHAVE_ID = 'flexo-simples-identificacao';
 
@@ -83,6 +91,22 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
   function n(v) { return Math.round(v * 100) / 100; }
+  /* Largura de um texto, para decidir a divisao em colunas. O canvas mede
+     com a mesma fonte da folha, entao o resultado e exato; a estimativa por
+     caractere so entra quando nao ha canvas (nos testes, fora do navegador). */
+  var FONTE = '"Segoe UI",Tahoma,Geneva,Verdana,sans-serif';
+  function medir(texto, tam) {
+    if (medir.ctx === undefined) {
+      try { medir.ctx = document.createElement('canvas').getContext('2d'); }
+      catch (e) { medir.ctx = null; }
+    }
+    if (!medir.ctx) return texto.length * tam * 0.52;
+    medir.ctx.font = tam + 'px ' + FONTE;
+    return medir.ctx.measureText(texto).width;
+  }
+  function maiorLargura(linhas, tam) {
+    return linhas.reduce(function (m, t) { return Math.max(m, medir(t, tam)); }, 0);
+  }
   function txt(x, y, tam, cor, conteudo, extra) {
     return '<text x="' + n(x) + '" y="' + n(y) + '" font-size="' + tam + '" fill="' + cor +
       '"' + (extra || '') + '>' + esc(conteudo) + '</text>';
@@ -171,6 +195,25 @@
     });
   }
 
+  /* Recorta o desenho no que ele realmente ocupa. Na tela a folga em volta
+     nao incomoda; na folha exportada ela e o que empurra as legendas para
+     um tamanho ilegivel depois que o Word reduz a imagem. getBBox devolve
+     a caixa do conteudo em unidades do proprio viewBox. */
+  function enquadrar(svg) {
+    var vb = (svg.getAttribute('viewBox') || '0 0 720 300').split(/\s+/).map(Number);
+    if (typeof svg.getBBox !== 'function') return vb;
+    var cx;
+    try { cx = svg.getBBox(); } catch (e) { return vb; }
+    if (!cx || !(cx.width > 1) || !(cx.height > 1)) return vb;
+    var folga = 10;
+    /* nunca alem do viewBox declarado: e ele que define o que e "dentro" */
+    var x0 = Math.max(vb[0], cx.x - folga);
+    var y0 = Math.max(vb[1], cx.y - folga);
+    return [x0, y0,
+      Math.min(vb[0] + vb[2], cx.x + cx.width + folga) - x0,
+      Math.min(vb[1] + vb[3], cx.y + cx.height + folga) - y0];
+  }
+
   /* ------------------------------------------------ montagem da folha */
   function montarSvg() {
     var dados = coletar();
@@ -185,14 +228,14 @@
     var y = 0;
 
     /* --- barra da marca --- */
-    corpo += '<rect x="0" y="0" width="' + LARG + '" height="56" fill="' + c.barra + '"/>';
-    corpo += '<rect x="0" y="56" width="' + LARG + '" height="4" fill="' + c.filete + '"/>';
-    corpo += '<text x="' + MARG + '" y="37" font-size="25" font-weight="700" ' +
+    corpo += '<rect x="0" y="0" width="' + LARG + '" height="54" fill="' + c.barra + '"/>';
+    corpo += '<rect x="0" y="54" width="' + LARG + '" height="4" fill="' + c.filete + '"/>';
+    corpo += '<text x="' + MARG + '" y="36" font-size="24" font-weight="700" ' +
       'letter-spacing="1" fill="none" stroke="' + c.barraTxt + '" stroke-width="1.1">FLEXO</text>';
-    corpo += '<text x="' + (MARG + 96) + '" y="37" font-size="25" font-weight="700" ' +
+    corpo += '<text x="' + (MARG + 90) + '" y="36" font-size="24" font-weight="700" ' +
       'letter-spacing="1" fill="' + c.marca + '">SIMPLES</text>';
-    corpo += txt(LARG - MARG, 37, 16, c.barraTxt, dados.titulo, ' text-anchor="end"');
-    y = 60;
+    corpo += txt(LARG - MARG, 36, 16.5, c.barraTxt, dados.titulo, ' text-anchor="end"');
+    y = 58;
 
     /* --- identificacao --- */
     var linhasId = [
@@ -203,57 +246,71 @@
       ['Data', dataDeHoje()],
       ['Norma', norma ? 'ABNT NBR 6118:' + norma : '—']
     ];
-    var altId = 44 + Math.ceil(linhasId.length / 2) * 26;
+    var altId = 46 + Math.ceil(linhasId.length / 2) * 27;
     corpo += '<rect x="' + MARG + '" y="' + (y + 20) + '" width="' + (LARG - 2 * MARG) +
       '" height="' + altId + '" fill="#fafafa" stroke="#dcdcdc"/>';
-    corpo += '<text x="' + (MARG + 16) + '" y="' + (y + 44) + '" font-size="11.5" ' +
+    corpo += '<text x="' + (MARG + 16) + '" y="' + (y + 44) + '" font-size="12.5" ' +
       'letter-spacing="1.6" fill="#8a8a8a">IDENTIFICAÇÃO</text>';
     linhasId.forEach(function (par, i) {
       var col = i % 2, lin = Math.floor(i / 2);
       var xi = MARG + 16 + col * ((LARG - 2 * MARG - 32) / 2);
-      var yi = y + 72 + lin * 26;
-      corpo += txt(xi, yi, 13, '#7a7a7a', par[0]);
-      corpo += txt(xi + 100, yi, 13.5, '#1a1a1a', par[1], ' font-weight="600"');
+      var yi = y + 74 + lin * 27;
+      corpo += txt(xi, yi, 14.5, '#7a7a7a', par[0]);
+      corpo += txt(xi + 96, yi, 15, '#1a1a1a', par[1], ' font-weight="600"');
     });
     y += 20 + altId + 22;
 
     /* --- corpo do relatorio --- */
     dados.blocos.forEach(function (b) {
       if (b.tipo === 'titulo') {
-        y += b.nivel === 2 ? 30 : 22;
-        var tam = b.nivel === 2 ? 19 : 15.5;
-        corpo += '<rect x="' + MARG + '" y="' + n(y - tam + 2) + '" width="4" height="' +
+        y += b.nivel === 2 ? 32 : 24;
+        var tam = b.nivel === 2 ? 21 : 17;
+        corpo += '<rect x="' + MARG + '" y="' + n(y - tam + 2) + '" width="4.5" height="' +
           n(tam + 5) + '" fill="' + (b.nivel === 2 ? c.acento : '#d0d0d0') + '"/>';
-        corpo += txt(MARG + 14, y, tam, c.titulo, b.texto, ' font-weight="600"');
-        y += 6;
+        corpo += txt(MARG + 15, y, tam, c.titulo, b.texto, ' font-weight="600"');
+        y += 7;
       } else if (b.tipo === 'texto') {
-        /* blocos longos saem em duas colunas: a folha fica menos comprida
-           e cabe melhor no corpo do documento */
-        var cols = b.linhas.length >= 4 ? 2 : 1;
-        var porCol = Math.ceil(b.linhas.length / cols);
-        var lc = (LARG - 2 * MARG - 14) / cols;
+        /* Blocos longos saem em duas colunas: a folha fica menos comprida e
+           cabe melhor no documento. As colunas nao sao metades iguais — a
+           segunda comeca onde a primeira realmente termina —, senao uma
+           unica linha comprida jogaria o bloco inteiro para uma coluna so. */
+        var esq = MARG + 15;
+        var util = LARG - MARG - esq;
+        var porCol = Math.ceil(b.linhas.length / 2);
+        var x2 = 0;
+        if (b.linhas.length >= 4) {
+          var l1 = maiorLargura(b.linhas.slice(0, porCol), CORPO);
+          var l2 = maiorLargura(b.linhas.slice(porCol), CORPO);
+          if (l1 + 30 + l2 <= util) {
+            x2 = Math.min(Math.max(l1 + 30, util * 0.48), util - l2);
+          }
+        }
+        if (!x2) porCol = b.linhas.length;
         y += 12;
         b.linhas.forEach(function (t, i) {
           var col = Math.floor(i / porCol);
-          corpo += txt(MARG + 14 + col * lc, y + (i % porCol) * 22 + 14, 14, '#1a1a1a', t);
+          corpo += txt(esq + col * x2, y + (i % porCol) * 25 + 16, CORPO, '#1a1a1a', t);
         });
-        y += porCol * 22 + 8;
+        y += porCol * 25 + 8;
       } else if (b.tipo === 'aviso') {
         y += 14;
         corpo += '<rect x="' + MARG + '" y="' + y + '" width="' + (LARG - 2 * MARG) +
-          '" height="30" fill="#fdf3f3"/>';
-        corpo += '<rect x="' + MARG + '" y="' + y + '" width="3" height="30" fill="#c00000"/>';
-        corpo += txt(MARG + 14, y + 20, 13.5, '#8b0000', b.texto);
-        y += 36;
+          '" height="33" fill="#fdf3f3"/>';
+        corpo += '<rect x="' + MARG + '" y="' + y + '" width="3.5" height="33" fill="#c00000"/>';
+        corpo += txt(MARG + 15, y + 22, 15, '#8b0000', b.texto);
+        y += 39;
       } else if (b.tipo === 'figura') {
-        var vbTxt = b.svg.getAttribute('viewBox') || '0 0 720 300';
-        var vb = vbTxt.split(/\s+/).map(Number);
-        var lf = Math.min(LARG - 2 * MARG, LARG_FIG);
+        var vb = enquadrar(b.svg);
+        /* Depois do recorte cada desenho tem uma largura util diferente. Se
+           todos fossem esticados ate a margem, o mais compacto sairia com a
+           legenda maior que o texto do relatorio e o mais largo, menor: o
+           limite abaixo mira um tamanho unico de legenda para todos. */
+        var lf = Math.min(LARG - 2 * INSET_FIG, vb[2] * (ALVO_LEGENDA / FONTE_DESENHO));
         var af = (vb[3] / vb[2]) * lf;
         y += 10;
         /* a classe do desenho precisa vir junto: e ela que casa com o CSS */
         corpo += '<svg x="' + n((LARG - lf) / 2) + '" y="' + n(y) + '" width="' + n(lf) +
-          '" height="' + n(af) + '" viewBox="' + vbTxt + '" class="' +
+          '" height="' + n(af) + '" viewBox="' + vb.map(n).join(' ') + '" class="' +
           (b.svg.getAttribute('class') || 'dg') + '">' + b.svg.innerHTML + '</svg>';
         y += af + 10;
       }
@@ -264,9 +321,9 @@
     corpo += '<line x1="' + MARG + '" y1="' + n(y) + '" x2="' + (LARG - MARG) + '" y2="' +
       n(y) + '" stroke="#dcdcdc"/>';
     y += 22;
-    corpo += txt(MARG, y, 11.5, '#9a9a9a',
+    corpo += txt(MARG, y, 12.5, '#9a9a9a',
       'Gerado por Flexo Simples em ' + dataDeHoje() +
-      ' · cálculo segundo a ABNT NBR 6118 · conferir por profissional habilitado.');
+      ' · ABNT NBR 6118 · conferir por profissional habilitado.');
     y += 24;
 
     var altura = Math.ceil(y);

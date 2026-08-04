@@ -150,10 +150,18 @@ elemento, responsável, revisão, data e a norma adotada. Os quatro campos ficam
 no navegador, então continuam preenchidos na próxima vez.
 
 O que a folha **não** é: um *print* da tela. O painel de entrada e a moldura da janela
-ficam de fora, e as duas colunas de dados são reorganizadas para o documento não ficar
-com uma imagem desnecessariamente comprida. O tema em uso (clássico ou corporativo) vale
-também para a folha — só as cores de convenção do desenho técnico (verde nas cotas,
-vermelho na armadura, azul nas deformações) são as mesmas nos dois.
+ficam de fora, os dados são reagrupados em duas colunas e os desenhos são recortados no
+que de fato ocupam. O tema em uso (clássico ou corporativo) vale também para a folha — só
+as cores de convenção do desenho técnico (verde nas cotas, vermelho na armadura, azul nas
+deformações) são as mesmas nos dois.
+
+A folha é **estreita de propósito**. Colada no Word, a imagem é reduzida até a largura útil
+da página, e o que decide se o texto fica legível não é o tamanho da fonte, mas a razão
+entre ela e a largura da folha: com 760 unidades e corpo em 16, o texto sai por volta de
+9,5 pt no documento. Pela mesma razão os desenhos são ampliados até um alvo comum de
+tamanho de legenda, em vez de esticados até a margem — assim nenhum sai com letra maior
+ou menor que os outros. `test/exportar.test.js` guarda esse compromisso: falha se a folha
+alargar sem que as fontes acompanhem.
 
 A imagem é composta em SVG a partir do próprio relatório e rasterizada em 2× pelo
 `canvas` do navegador. Não há biblioteca nem serviço externo envolvido: funciona offline

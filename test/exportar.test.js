@@ -211,13 +211,40 @@ test('a folha e um SVG valido nas duas ferramentas e nos dois temas', () => {
     /* dimensoes reais, do jeito que a rasterizacao espera encontrar */
     const m = /^<svg[^>]*\swidth="(\d+)"\sheight="(\d+)"/.exec(svg);
     assert.ok(m, nome + ': a folha precisa declarar largura e altura inteiras');
-    assert.strictEqual(Number(m[1]), 1120, nome);
+    assert.strictEqual(Number(m[1]), 760, nome);
     assert.ok(Number(m[2]) > 600, nome + ': folha curta demais — ' + m[2]);
     /* tags abertas e fechadas em numero igual */
     const abre = (svg.match(/<svg[ >]/g) || []).length;
     const fecha = (svg.match(/<\/svg>/g) || []).length;
     assert.strictEqual(abre, fecha, nome + ': <svg> aninhado sem fechar');
   }
+});
+
+/* Colada no Word, a imagem e reduzida ate a largura util da pagina. O que
+   define se o texto fica legivel e a razao entre a fonte e a largura da
+   folha — 1,8 % dela da por volta de 9 pt numa pagina A4 com margens
+   normais. Este teste existe para que a folha nao volte a engordar sem que
+   as fontes acompanhem. */
+test('o texto da folha e grande o bastante para ser lido depois de colado', () => {
+  const svg = folhaFlexao('classico', { idProjeto: 'P-99', idElemento: 'V1' });
+  const larg = Number(/^<svg[^>]*\swidth="(\d+)"/.exec(svg)[1]);
+  const tamanhos = [...svg.matchAll(/font-size="([\d.]+)"/g)].map((m) => Number(m[1]));
+
+  assert.ok(tamanhos.length > 20, `poucos textos na folha: ${tamanhos.length}`);
+  const pt = (t) => (t / larg) * 16 /* cm úteis da página */ / 2.54 * 72;
+
+  /* o grosso da folha — resultados, dados, identificacao — precisa sair
+     confortavel. Rotulos secundarios (rodape, legenda do quadro de
+     identificacao) podem ser menores, mas nao microscopicos. */
+  const confortaveis = tamanhos.filter((t) => pt(t) >= 8.5).length;
+  assert.ok(confortaveis / tamanhos.length >= 0.7,
+    `so ${(100 * confortaveis / tamanhos.length).toFixed(0)} % dos textos sairiam com 8,5 pt ou mais`);
+
+  const menor = Math.min(...tamanhos);
+  assert.ok(pt(menor) >= 7, `o menor texto da folha sairia com ${pt(menor).toFixed(1)} pt`);
+
+  /* e a folha nao pode alargar sem que as fontes acompanhem */
+  assert.ok(larg <= 900, `folha larga demais (${larg}): o Word encolhe tudo`);
 });
 
 test('a folha traz a identificacao, o titulo e a norma', () => {
