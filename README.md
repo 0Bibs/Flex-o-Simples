@@ -269,7 +269,7 @@ Testes automatizados (sem dependências, com o `node:test` nativo):
 node --test
 ```
 
-São 51 testes em três arquivos, executados a cada push pelo
+São 72 testes em quatro arquivos, executados a cada push pelo
 `.github/workflows/testes.yml`:
 
 - `test/flexao.test.js` — o caso de referência, os parâmetros normativos dos dois grupos de
@@ -279,7 +279,8 @@ São 51 testes em três arquivos, executados a cada push pelo
 - `test/cisalhamento.test.js` — o caso de referência de cortante e de torção (tabela acima),
   equivalência entre o modelo II com θ = 45° e o modelo I, redução da armadura com θ menor,
   aviso de ruptura da biela, limite de 435 MPa no f<sub>ywd</sub>, espaçamentos máximos do
-  item 18.3.3.2 e cobertura da demanda pelo estribo adotado.
+  item 18.3.3.2, cobertura da demanda pelo estribo adotado e a garantia de que T<sub>Rd3</sub>
+  e T<sub>Rd4</sub> não são o T<sub>Sd</sub> disfarçado (ver abaixo).
 - `test/pagina.test.js` — consistência entre `index.html` e `js/app.js` (todo id usado
   existe), ordem de carga dos scripts, ausência de qualquer recurso externo e geração dos
   dois SVG sem `NaN` para seção retangular, T, armadura dupla e momento nulo. Cobre também
@@ -287,6 +288,28 @@ São 51 testes em três arquivos, executados a cada push pelo
   declarado, e a lista de cache do `sw.js` em sincronia com o que a página realmente usa.
   Confere ainda o `.ico` do atalho (cabeçalho, tamanhos e deslocamentos) e se o script do
   atalho aponta para arquivos existentes.
+
+## T<sub>Rd3</sub> e T<sub>Rd4</sub>: o que é verificação e o que é dimensionamento
+
+O item 17.5.1.3 define T<sub>Rd,3</sub> e T<sub>Rd,4</sub> como os torques resistidos pela
+armadura **transversal** e pela **longitudinal efetivamente dispostas**. São verificações,
+não resultados do dimensionamento — e por isso dependem do detalhamento:
+
+- **T<sub>Rd3</sub>** sai do estribo que a ferramenta adotou (bitola, ramos e espaçamento),
+  descontada a demanda do cortante no mesmo ramo. É o espelho do V<sub>Rd3</sub>, que
+  desconta a demanda da torção. Cada verificação atende à necessidade da outra e fica com a
+  sobra do arredondamento do espaçamento.
+- **T<sub>Rd4</sub>** depende de `Asl,ef`, a armadura longitudinal total efetivamente
+  disposta no perímetro para torção — um dado do detalhamento, que a ferramenta **não** tem
+  como deduzir. Com o campo em branco o relatório mostra `—`; preenchido, fecha a
+  verificação `TSd ≤ TRd4`.
+
+$$T_{Rd,4} = \frac{2\,A_e\,f_{ywd}}{\tan\theta}\cdot\frac{A_{s\ell,\text{ef}}}{u_e}$$
+
+Uma versão anterior calculava os dois a partir da própria armadura que o programa
+dimensiona. Como essa armadura vem de inverter a mesma fórmula, o resultado devolvia o
+T<sub>Sd</sub> de volta: parecia verificação e não era. O commit está preservado no branch
+`backup/antes-asl-ef`, e `test/cisalhamento.test.js` agora falha se o defeito voltar.
 
 ## Estrutura
 

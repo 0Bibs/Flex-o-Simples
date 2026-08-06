@@ -33,6 +33,7 @@
       modelo: $('modelo').value,
       theta: val('theta'), alpha: val('alpha'),
       refMin: $('refMin').value,
+      aslEf: val('aslEf'),
       Vsd: val('vsd'), Tsd: val('tsd'),
       diamEstribo: parseFloat($('diamEstribo').value),
       nRamos: Math.max(2, Math.round(val('nRamos')))
@@ -55,6 +56,16 @@
   }
 
   /* ------------------------------------------------ render */
+  /* 'X tfm (origem) [ok|abaixo do solicitante]' — deixa claro de onde veio a
+     resistencia e se ela cobre o solicitante. */
+  function verifica(valor, solicitante, origem) {
+    if (!isFinite(valor)) return '— <span class="marca-min">' + origem + '</span>';
+    return dec(valor, 2) + ' tfm (' + origem + ') ' +
+      (valor >= solicitante
+        ? '<span class="marca-ok">≥ T<sub>Sd</sub></span>'
+        : '<span class="marca-ruim">&lt; T<sub>Sd</sub></span>');
+  }
+
   /* Escreve num campo do relatorio se ele existir: com um service worker
      servindo pagina e script de versoes diferentes, um id novo pode faltar
      no HTML em cache, e um id ausente nao pode derrubar o relatorio todo. */
@@ -120,8 +131,11 @@
         '<p>A<sub>sl,face</sub> = ' + dec(T.aslFaceHor, 2) + ' cm² (horizontal) · ' +
         dec(T.aslFaceVer, 2) + ' cm² (vertical)</p>' +
         '<p>T<sub>Rd2</sub> = ' + dec(T.TRd2Tfm, 2) + ' tfm</p>' +
-        '<p>T<sub>Rd3</sub> = ' + dec(T.TRd3Tfm, 2) + ' tfm</p>' +
-        '<p>T<sub>Rd4</sub> = ' + dec(T.TRd4Tfm, 2) + ' tfm</p>' +
+        '<p>T<sub>Rd3</sub> = ' + verifica(T.TRd3Tfm, T.TsdTfm, 'estribo adotado') + '</p>' +
+        '<p>T<sub>Rd4</sub> = ' +
+        (T.aslEf > 0
+          ? verifica(T.TRd4Tfm, T.TsdTfm, 'A<sub>sl,ef</sub> = ' + dec(T.aslEf, 2) + ' cm²')
+          : '— <span class="marca-min">informe A<sub>sl,ef</sub></span>') + '</p>' +
         '<p>h<sub>e</sub> = ' + dec(T.he, 1) + ' cm · b<sub>nuc</sub> = ' +
         dec(T.bnuc, 1) + ' cm · h<sub>nuc</sub> = ' + dec(T.hnuc, 1) + ' cm</p>');
     }
@@ -204,7 +218,7 @@
     });
 
     ['fck', 'fyk', 'gammaC', 'gammaS', 'bw', 'bwMin', 'h', 'd', 'c1',
-      'modelo', 'theta', 'alpha', 'refMin', 'diamEstribo', 'nRamos', 'norma']
+      'modelo', 'theta', 'alpha', 'refMin', 'aslEf', 'diamEstribo', 'nRamos', 'norma']
       .forEach(function (id) {
         $(id).addEventListener('input', calcular);
         $(id).addEventListener('change', calcular);

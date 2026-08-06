@@ -73,9 +73,40 @@ test('torcao: armaduras transversal e longitudinal da referencia', () => {
   assert.ok(perto(T.aslMinM, 1.29, 0.01), `Asl,min = ${T.aslMinM}`);
   assert.ok(perto(T.a90MinM, 2.32, 0.01), `A90,min 1R = ${T.a90MinM}`);
   assert.ok(perto(T.a90MinDuploM, 4.63, 0.01), `A90,min 2R = ${T.a90MinDuploM}`);
-  /* TRd3 e TRd4 fecham no solicitante quando se adota a armadura necessaria */
-  assert.ok(perto(T.TRd3Tfm, 6.96, 0.01), `TRd3 = ${T.TRd3Tfm}`);
-  assert.ok(perto(T.TRd4Tfm, 6.96, 0.01), `TRd4 = ${T.TRd4Tfm}`);
+  /* TRd3 sai do estribo que foi adotado, e nao da armadura necessaria: o
+     arredondamento do espacamento para baixo deixa uma folga */
+  assert.ok(T.TRd3Tfm > T.TsdTfm, `TRd3 = ${T.TRd3Tfm} deveria superar TSd = ${T.TsdTfm}`);
+  /* e sem a armadura longitudinal efetiva nao ha TRd4 nenhum */
+  assert.strictEqual(T.TRd4Tfm, null, `TRd4 = ${T.TRd4Tfm} sem Asl,ef informado`);
+});
+
+/* Este teste existe por causa de um erro real: TRd3 e TRd4 eram calculados a
+   partir da propria armadura que o programa dimensiona, entao devolviam o
+   TSd de volta e nao verificavam nada. */
+test('torcao: TRd3 e TRd4 nao podem ser o TSd disfarcado', () => {
+  const fino = Cisalhamento.calcular(base({ modo: 'TORCAO', diamEstribo: 6.3 }));
+  const grosso = Cisalhamento.calcular(base({ modo: 'TORCAO', diamEstribo: 12.5 }));
+  assert.notStrictEqual(fino.torcao.TRd3Tfm, grosso.torcao.TRd3Tfm,
+    'trocar a bitola do estribo tem de mudar o TRd3');
+
+  const pouca = Cisalhamento.calcular(base({ modo: 'TORCAO', aslEf: 5 }));
+  const muita = Cisalhamento.calcular(base({ modo: 'TORCAO', aslEf: 20 }));
+  assert.ok(muita.torcao.TRd4Tfm > pouca.torcao.TRd4Tfm,
+    'mais armadura longitudinal tem de dar mais TRd4');
+  assert.ok(pouca.torcao.TRd4Tfm < pouca.torcao.TsdTfm,
+    'armadura longitudinal insuficiente nao pode resultar em TRd4 >= TSd');
+});
+
+test('torcao: TRd4 fecha exatamente no TSd com a armadura necessaria', () => {
+  const nec = Cisalhamento.calcular(base({ modo: 'TORCAO' })).torcao.aslTotal;
+  const r = Cisalhamento.calcular(base({ modo: 'TORCAO', aslEf: nec }));
+  assert.ok(perto(r.torcao.TRd4Tfm, r.torcao.TsdTfm, 0.01),
+    `TRd4 = ${r.torcao.TRd4Tfm} com Asl,ef = Asl,nec = ${nec}`);
+
+  /* abaixo disso o relatorio precisa avisar, e nao so mostrar um numero */
+  const curto = Cisalhamento.calcular(base({ modo: 'TORCAO', aslEf: nec * 0.7 }));
+  assert.ok(curto.avisos.some((m) => m.includes('T<sub>Rd4</sub>')),
+    'faltou o aviso de armadura longitudinal insuficiente: ' + curto.avisos.join(' | '));
 });
 
 test('cortante + torcao: interacao das bielas', () => {

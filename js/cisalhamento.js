@@ -143,12 +143,31 @@
     var a90Nec = Math.max(a90, a90Min);
     var aslNec = Math.max(asl, aslMin);
 
+    /* Fatores da trelica espacial: multiplicados pela taxa de armadura
+       (cm2/cm) devolvem o torque resistido, em kN.cm. Ficam separados
+       porque TRd3 so pode ser fechado depois que o estribo e adotado. */
+    var fatorT3 = 2 * Ae * m.fywd * cotg(theta);
+    var fatorT4 = (2 * Ae * m.fywd) / Math.tan(theta);
+
+    /* TRd4 depende da armadura longitudinal que sera de fato detalhada, e
+       nao da que o programa acabou de calcular — item 17.5.1.3. Sem esse
+       dado nao existe verificacao, so a area necessaria. */
+    var aslEf = e.aslEf > 0 ? e.aslEf : 0;                 /* cm2, total */
+    var aslEfPorCm = ue > 0 ? aslEf / ue : 0;
+    var TRd4 = aslEf > 0 ? fatorT4 * aslEfPorCm : null;
+    if (TRd4 !== null && Tsd > TRd4) {
+      avisos.push('T<sub>Sd</sub> = ' + (Tsd / 1000).toFixed(2) +
+        ' tfm supera T<sub>Rd4</sub> = ' + (TRd4 / 1000).toFixed(2) +
+        ' tfm: a armadura longitudinal informada não equilibra a torção.');
+    }
+
     return {
       Tsd: Tsd, TsdTfm: Tsd / 1000, TskTfm: Tsd / 1000 / (e.gammaF || 1),
       he: he, bnuc: bnuc, hnuc: hnuc, Ae: Ae, ue: ue, c1: e.c1,
       TRd2: TRd2, TRd2Tfm: TRd2 / 1000,
-      TRd3Tfm: Math.max(Tsd, 2 * Ae * a90Nec * m.fywd * cotg(theta)) / 1000,
-      TRd4Tfm: Math.max(Tsd, (2 * Ae * aslNec * m.fywd) / Math.tan(theta)) / 1000,
+      fatorT3: fatorT3, fatorT4: fatorT4,
+      aslEf: aslEf, aslEfM: aslEfPorCm * 100,
+      TRd4Tfm: TRd4 === null ? null : TRd4 / 1000,
       a90: a90, a90M: a90 * 100,
       a90Min: a90Min, a90MinM: a90Min * 100,
       a90MinDuploM: m.rhoMin * bw * 100,
@@ -227,6 +246,21 @@
       V.VswRealTf = Norma.kNParaTf(aswReal * V.braco);
       V.VRd3Tf = V.VcTf + V.VswRealTf;
       V.folga = V.VRd3Tf / V.VsdTf;
+    }
+
+    /* TRd3 = torque que o ramo externo do estribo adotado ainda equilibra,
+       depois de reservada a demanda do cortante. E o espelho do VRd3, que
+       reserva a demanda da torcao: cada verificacao atende a necessidade da
+       outra e fica com a sobra do arredondamento do espacamento. */
+    if (comT && isFinite(sAdotado) && sAdotado > 0) {
+      var a90Disp = areaPorRamo / sAdotado - (comV ? V.aswNec / e.nRamos : 0);
+      T.a90RealM = Math.max(0, a90Disp) * 100;
+      T.TRd3Tfm = (T.fatorT3 * Math.max(0, a90Disp)) / 1000;
+      if (T.TsdTfm > T.TRd3Tfm) {
+        avisos.push('T<sub>Sd</sub> = ' + T.TsdTfm.toFixed(2) +
+          ' tfm supera T<sub>Rd3</sub> = ' + T.TRd3Tfm.toFixed(2) +
+          ' tfm: o estribo adotado não equilibra a torção.');
+      }
     }
 
     return {
