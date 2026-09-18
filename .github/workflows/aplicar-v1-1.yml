@@ -1,0 +1,59 @@
+name: Aplicação única do patch 1.1
+
+on:
+  push:
+    branches: ['codex/flexao-simples-v1.1']
+    paths: ['.github/workflows/aplicar-v1-1.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aplicar-flexao-v1-1
+  cancel-in-progress: false
+
+jobs:
+  aplicar:
+    if: github.repository == '0Bibs/Flex-o-Simples' && github.ref == 'refs/heads/codex/flexao-simples-v1.1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/flexao-simples-v1.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Conferir integridade e aplicar patch conhecido
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, pathlib, subprocess
+          parts = [pathlib.Path(f'.v1.1-transfer/part-{i:02}.b64') for i in range(1, 5)]
+          encoded = ''.join(p.read_text().strip() for p in parts)
+          patch = gzip.decompress(base64.b64decode(encoded, validate=True))
+          expected = '9fffe1d5631cb9515dffb31a92a37eb15c89902bf98b2ad89e510a6cd3149978'
+          assert hashlib.sha256(patch).hexdigest() == expected, 'Patch diferente do pacote testado'
+          subprocess.run(['git', 'apply', '--check', '-'], input=patch, check=True)
+          subprocess.run(['git', 'apply', '-'], input=patch, check=True)
+          print('Patch 1.1: integridade SHA-256 confirmada.')
+          PY
+      - name: Validar antes de registrar
+        run: node --test
+      - name: Registrar somente a versão 1.1, sem merge e sem publicação
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add CHANGELOG.md README.md VERSAO-1.1.md js/app.js js/app-cisalhamento.js js/exportar.js scripts/atualizar-cache.cjs scripts/testar-interface.py sw.js test/versao-1.1.test.js
+          git rm .v1.1-transfer/part-01.b64 .v1.1-transfer/part-02.b64 .v1.1-transfer/part-03.b64 .v1.1-transfer/part-04.b64
+          git commit -m 'feat: Flexo Simples 1.1 — memorial, exportação 165 mm e proteção contra resultados inválidos'
+          git push origin HEAD:refs/heads/codex/flexao-simples-v1.1
+      - name: Guardar código validado para comparação
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexao-simples-v1.1-validado
+          retention-days: 30
+          include-hidden-files: true
+          path: |
+            .
+            !.git
+            !node_modules
+            !.github/workflows/aplicar-v1-1.yml
