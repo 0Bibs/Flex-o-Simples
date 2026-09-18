@@ -19,7 +19,7 @@
    conjunto inteiro de uma vez. O valor e conferido (e ditado) pelo
    test/pagina.test.js: rode os testes depois de mexer em qualquer arquivo
    da lista abaixo. */
-var CACHE = 'flexo-simples-130c6b403e';
+var CACHE = 'flexo-simples-669b67daaa';
 
 /* Tudo o que a ferramenta precisa para funcionar offline.
    Mantido em sincronia com index.html pelo test/pagina.test.js */
@@ -29,10 +29,13 @@ var ARQUIVOS = [
   'manifest.json',
   'manifest-corporativo.json',
   'css/styles.css',
+  'css/painel-flexao.css',
   'js/norma.js',
   'js/flexao.js',
   'js/desenho-equilibrio.js',
   'js/desenho-dominios.js',
+  'js/entrada-flexao.js',
+  'js/painel-flexao.js',
   'js/app.js',
   'js/exportar.js',
   'js/tema.js',

@@ -48,6 +48,8 @@ test('os scripts sao carregados na ordem de dependencia', () => {
     'js/flexao.js',
     'js/desenho-equilibrio.js',
     'js/desenho-dominios.js',
+    'js/entrada-flexao.js',
+    'js/painel-flexao.js',
     'js/app.js',
     'js/exportar.js',
     'js/tema.js'
