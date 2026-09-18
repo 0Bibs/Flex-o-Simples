@@ -1,0 +1,92 @@
+name: Aplicar revisão 1.2
+
+on:
+  push:
+    branches: ['codex/flexao-simples-v1.2']
+    paths: ['.github/workflows/aplicar-v12.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aplicar-flexao-v12
+  cancel-in-progress: false
+
+jobs:
+  aplicar:
+    if: github.repository == '0Bibs/Flex-o-Simples' && github.ref == 'refs/heads/codex/flexao-simples-v1.2'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/flexao-simples-v1.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Conferir pacote conhecido
+        run: |
+          node <<'JS'
+          const fs = require('node:fs');
+          const zlib = require('node:zlib');
+          const crypto = require('node:crypto');
+          const path = require('node:path');
+          const encoded = [1,2,3].map(i => fs.readFileSync(`.transfer-v12/part-${i}.b64`, 'utf8').trim()).join('');
+          const data = zlib.brotliDecompressSync(Buffer.from(encoded, 'base64'));
+          const sha = crypto.createHash('sha256').update(data).digest('hex');
+          if (sha !== '69df1ba64512c0cd5639793790f76de2c5829886d9f2858d979ac10313b54631') throw Error('Integridade do pacote divergente');
+          fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'v12-edits.json'), data);
+          console.log('Integridade SHA-256 do pacote confirmada.');
+          JS
+      - name: Conferir originais e aplicar alterações
+        run: |
+          python3 - <<'PY'
+          import os, json, hashlib, pathlib
+          root = pathlib.Path.cwd()
+          entries = json.loads((pathlib.Path(os.environ['RUNNER_TEMP']) / 'v12-edits.json').read_bytes())
+          assert len(entries) == 17
+          pending = []
+          for entry in entries:
+              rel = pathlib.PurePosixPath(entry['path'])
+              assert not rel.is_absolute() and '..' not in rel.parts
+              target = root / str(rel)
+              exists = target.exists()
+              before = target.read_bytes() if exists else b''
+              actual = hashlib.sha256(before).hexdigest() if exists else None
+              assert actual == entry['before'], 'Original divergente: ' + str(rel)
+              lines = before.decode('utf-8').splitlines(keepends=True)
+              for edit in reversed(entry['edits']):
+                  lines[edit['start']:edit['end']] = edit['lines']
+              after = ''.join(lines).encode('utf-8')
+              assert hashlib.sha256(after).hexdigest() == entry['after'], 'Resultado divergente: ' + str(rel)
+              pending.append((target, after))
+          archive = root / 'docs/README-ate-1.1.md'
+          assert not archive.exists()
+          archive.parent.mkdir(parents=True, exist_ok=True)
+          archive.write_bytes((root / 'README.md').read_bytes())
+          for target, data in pending:
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(data)
+          print('17 alterações e 1 cópia histórica aplicadas; hashes individuais confirmados.')
+          PY
+      - name: Regressão da versão 1.2
+        run: node --test
+      - name: Registrar revisão sem merge e sem implantação
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add CHANGELOG.md README.md VALIDACAO-1.2.md VERSAO-1.2.md cisalhamento/index.html css/painel-flexao.css docs/README-ate-1.1.md index.html js/app.js js/entrada-flexao.js js/exportar.js js/painel-flexao.js scripts/testar-interface.py sw.js test/exportar.test.js test/pagina.test.js test/painel-1.2.test.js test/versao-1.1.test.js
+          git rm .transfer-v12/part-1.b64 .transfer-v12/part-2.b64 .transfer-v12/part-3.b64
+          git commit -m 'feat: versão 1.2 — painel técnico, geometria vinculada e unidades de momento'
+          git push origin HEAD:refs/heads/codex/flexao-simples-v1.2
+      - name: Pacote verificado
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexao-simples-v1.2-validado
+          retention-days: 30
+          include-hidden-files: true
+          path: |
+            .
+            !.git
+            !node_modules
+            !.transfer-v12
+            !.github/workflows/aplicar-v12.yml
