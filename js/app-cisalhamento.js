@@ -52,7 +52,31 @@
       lista.push('Coeficientes γ devem ser maiores que zero.');
     }
     if (e.bwMin > e.bw) lista.push('b<sub>w,mín</sub> não pode superar b<sub>w</sub>.');
+    if (!(e.gammaF > 0)) lista.push('Informe γ<sub>f</sub> maior que zero.');
+    if (!(e.bwMin > 0)) lista.push('Informe b<sub>w,mín</sub> maior que zero.');
+    if (e.fck > 90 || (e.fck > 0 && e.fck < 10)) lista.push('f<sub>ck</sub> deve estar na faixa implementada: 10 a 90 MPa.');
+    if (e.modelo === 'II' && !(e.theta >= 30 && e.theta <= 45)) lista.push('Informe θ entre 30° e 45°, faixa implementada.');
+    if (!(e.alpha >= 45 && e.alpha <= 90)) lista.push('Informe α entre 45° e 90°, faixa implementada.');
+    if (e.modo !== 'CORTANTE' && !(e.c1 > 0)) lista.push('Informe c<sub>1</sub> maior que zero para a torção.');
+    if (e.modo !== 'TORCAO' && (!$('vsd').value.trim() || e.Vsd < 0)) lista.push('Informe a magnitude não negativa de V<sub>Sd</sub>.');
+    if (e.modo !== 'CORTANTE' && (!$('tsd').value.trim() || e.Tsd < 0)) lista.push('Informe a magnitude não negativa de T<sub>Sd</sub>.');
+    if (e.aslEf < 0) lista.push('A<sub>sl,ef</sub> não pode ser negativa.');
+    if (!Number.isInteger(val('nRamos')) || val('nRamos') < 2 || val('nRamos') > 6) lista.push('Informe um número inteiro de ramos entre 2 e 6.');
     return lista;
+  }
+
+  /* A imagem deve corresponder a um calculo valido, nunca ao ultimo
+     resultado que sobrou na tela antes de uma entrada incorreta. */
+  function estadoRelatorio(valido) {
+    var rel = $('relatorio');
+    rel.setAttribute('data-calculo-valido', String(valido));
+    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg'].forEach(function (id) {
+      var b = $(id); if (b) b.disabled = !valido;
+    });
+    if (!valido) {
+      rel.querySelectorAll('.bloco, .figura').forEach(function (b) { b.innerHTML = ''; });
+      document.querySelectorAll('.painel output').forEach(function (o) { o.textContent = '—'; });
+    }
   }
 
   /* ------------------------------------------------ render */
@@ -82,6 +106,7 @@
     var e = entrada();
     var problemas = erros(e);
     if (problemas.length) {
+      estadoRelatorio(false);
       escreve('repAvisos', problemas.map(function (m) {
         return '<p class="aviso">' + m + '</p>';
       }).join(''));
@@ -92,6 +117,7 @@
   }
 
   function render(r, e) {
+    estadoRelatorio(true);
     var comV = !!r.cortante, comT = !!r.torcao;
 
     document.body.classList.toggle('modo-v', comV);
@@ -167,7 +193,8 @@
       '<p>Norma utilizada: NBR-6118:' + $('norma').value + '</p>' +
       '<p>Modelo de cálculo: ' + (r.modelo === 'II' ? 'II (biela a ' + num(r.theta) + '°)'
         : 'I (biela a 45°)') + '</p>' +
-      '<p>Inclinação do estribo: α = ' + num(r.alpha) + '°</p>');
+      '<p>Inclinação do estribo: α = ' + num(r.alpha) + '°</p>' +
+      '<p>Convenção de unidades do motor: 1 tf = 10 kN.</p>');
 
     escreve('repGeometria',
       '<p>b<sub>w</sub> = ' + num(r.bw) + ' cm</p>' +
@@ -189,7 +216,9 @@
     escreve('repEsforcos',
       (comV ? '<p>V<sub>Sk</sub> = ' + dec(r.cortante.VskTf, 2) + ' tf</p>' : '') +
       (comT ? '<p>T<sub>Sk</sub> = ' + dec(r.torcao.TskTfm, 2) + ' tfm</p>' : '') +
-      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>');
+      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>' +
+      (comV ? '<p>V<sub>Sd</sub> = ' + dec(r.cortante.VsdTf, 2) + ' tf</p>' : '') +
+      (comT ? '<p>T<sub>Sd</sub> = ' + dec(r.torcao.TsdTfm, 2) + ' tfm</p>' : ''));
 
     $('gammaFT').textContent = dec(r.gammaF, 2);
   }

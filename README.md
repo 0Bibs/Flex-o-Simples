@@ -1,5 +1,9 @@
 # Flexo Simples
 
+**Versão 1.1.0** — consulte [as notas da versão](VERSAO-1.1.md) para a nova ordem
+de memorial, exportação PNG de 2000 px / 165 mm, SVG e bloqueio de entradas inválidas.
+Os motores de cálculo foram preservados.
+
 Ferramentas livres de dimensionamento de concreto armado segundo a **ABNT NBR 6118**, sem
 dependência de software comercial e **sem nenhuma biblioteca externa**: é HTML, CSS e
 JavaScript puro.
@@ -161,8 +165,8 @@ PNG** pronta para colar no corpo do documento:
 - **Baixar imagem** salva o arquivo (`flexo-simples-<elemento>.png`);
 - **Copiar imagem** põe o PNG na área de transferência — no Word basta `Ctrl+V`.
 
-A folha sai da aba em que você está e traz exatamente o que está no relatório naquele
-momento: os blocos escondidos pelo modo atual (por exemplo, torção quando só o cortante
+A folha sai da aba em que você está e traz o conteúdo do relatório naquele
+momento, na ordem de memorial ou na ordem da tela conforme a seleção: os blocos escondidos pelo modo atual (por exemplo, torção quando só o cortante
 está ligado) ficam de fora. No topo vai um quadro de **identificação** com projeto e
 elemento — os dois campos ficam guardados no navegador, então continuam preenchidos na
 próxima vez — e, logo abaixo, a frase que diz o que aquela folha dimensiona:
@@ -189,8 +193,8 @@ tamanho de legenda, em vez de esticados até a margem — assim nenhum sai com l
 ou menor que os outros. `test/exportar.test.js` guarda esse compromisso: falha se a folha
 alargar sem que as fontes acompanhem.
 
-A imagem é composta em SVG a partir do próprio relatório e rasterizada em 2× pelo
-`canvas` do navegador. Não há biblioteca nem serviço externo envolvido: funciona offline
+A imagem é composta em SVG a partir do próprio relatório e rasterizada para 2000 px
+de largura pelo `canvas` do navegador (versão 1.1). Não há biblioteca nem serviço externo envolvido: funciona offline
 e com a página aberta por duplo clique.
 
 ## Base de cálculo — flexão
