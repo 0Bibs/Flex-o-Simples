@@ -272,11 +272,14 @@ test('o texto da folha e grande o bastante para ser lido depois de colado', () =
 
 test('a folha traz a identificacao e o titulo', () => {
   const svg = folhaFlexao('classico', { idProjeto: 'Plataforma P-99', idElemento: 'V12' });
-  assert.ok(svg.includes('IDENTIFICAÇÃO'));
-  for (const t of ['Plataforma P-99', 'V12', 'Flexão simples', 'Projeto', 'Elemento']) {
+  assert.ok(svg.includes('ELEMENTO —'));
+  assert.ok(!svg.includes('IDENTIFICAÇÃO'));
+  for (const t of ['V12', 'Flexão simples', 'ELEMENTO']) {
     assert.ok(svg.includes(t), 'faltou na folha: ' + t);
   }
-  /* o quadro ficou so com projeto e elemento */
+  assert.ok(!svg.includes('Plataforma P-99'));
+  assert.ok(!svg.includes('>Projeto<'));
+  /* Contrato 1.2: identificacao apenas pelo elemento. */
   for (const t of ['Responsável', 'Revisão', '>Data<', 'ABNT NBR 6118:']) {
     assert.ok(!svg.includes(t), 'saiu do quadro mas continua na folha: ' + t);
   }
@@ -334,7 +337,7 @@ test('o tema muda a identidade visual da folha, nao as cores do desenho', () => 
 });
 
 test('o texto que vem da tela e escapado antes de entrar no SVG', () => {
-  const svg = folhaFlexao('classico', { idProjeto: 'A & B <script>' });
+  const svg = folhaFlexao('classico', { idElemento: 'A & B <script>' });
   assert.ok(svg.includes('A &amp; B &lt;script&gt;'), 'texto sem escape');
   assert.ok(!svg.includes('<script>'), 'marcacao crua entrou na folha');
 });
@@ -355,7 +358,7 @@ test('o nome do arquivo sai limpo a partir da identificacao', () => {
 test('as duas paginas tem os campos de identificacao e os botoes', () => {
   for (const pagina of ['index.html', 'cisalhamento/index.html']) {
     const h = fs.readFileSync(path.join(raiz, pagina), 'utf8');
-    for (const id of ['idProjeto', 'idElemento',
+    for (const id of ['idElemento',
       'btBaixarImagem', 'btCopiarImagem', 'exportAviso']) {
       assert.ok(h.includes('id="' + id + '"'), pagina + ': faltou #' + id);
     }

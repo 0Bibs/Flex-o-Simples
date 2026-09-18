@@ -12,9 +12,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Flexo Simples">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/painel-flexao.css">
 <script>/* aplica o tema antes de pintar, para a pagina nao piscar */try{var t=localStorage.getItem("flexo-simples-tema");document.documentElement.setAttribute("data-tema",t==="corporativo"?"corporativo":"classico")}catch(e){}</script>
 </head>
-<body>
+<body class="pagina-flexao">
 
 <div class="janela">
 
@@ -27,13 +28,18 @@
       <a href="cisalhamento/index.html">Cortante/Torção</a>
     </nav>
     <button type="button" class="bt-tema" id="btTema">Clássico</button>
-    <span class="jbotoes" aria-hidden="true">
-      <span class="jb jb-min"></span>
-      <span class="jb jb-max"></span>
-      <span class="jb jb-fec"></span>
-    </span>
+    <span class="versao-janela">v1.2.0</span>
   </header>
 
+  <nav class="barra-ferramentas" aria-label="Dados e resultados">
+    <button type="button" data-foco="bw">Geometria <kbd>F2</kbd></button>
+    <button type="button" data-foco="fck">Materiais <kbd>F3</kbd></button>
+    <button type="button" data-foco="asArea">Armaduras <kbd>F4</kbd></button>
+    <button type="button" data-foco="msd">Esforços <kbd>F5</kbd></button>
+    <span class="separador"></span>
+    <button type="button" id="btRecalcular">Dimensionar <kbd>F9</kbd></button>
+    <button type="button" id="btExportarPainel">Copiar painel</button>
+  </nav>
   <div class="conteudo">
 
     <!-- ------------------------------------------------ painel de dados -->
@@ -48,7 +54,7 @@
       </div>
 
       <section class="grupo aberto">
-        <h2 class="cab"><span class="chev"></span>Materiais</h2>
+        <h2 class="cab"><span class="chev"></span><strong>Materiais</strong></h2>
         <div class="corpo">
           <div class="campo">
             <label for="fyk">f<sub>yk</sub></label>
@@ -110,16 +116,36 @@
             <span class="un">cm</span>
           </div>
           <div class="campo">
+            <label for="h">h</label>
+            <input type="number" id="h" value="49" step="1" min="0.01" aria-describedby="notaGeometria">
+            <span class="un">cm</span>
+          </div>
+          <div class="campo">
             <label for="d">d</label>
             <input type="number" id="d" value="45" step="1" min="1">
             <span class="un">cm</span>
           </div>
+          <div class="campo">
+            <label for="dl">d′</label>
+            <input type="number" id="dl" value="4" step="0.5" min="0" aria-describedby="notaGeometria">
+            <span class="un">cm</span>
+          </div>
+          <p class="nota" id="notaGeometria"><b>h = d + d′.</b> Alterar h ou d′ recalcula d;
+            alterar d recalcula h. d′ é o afastamento da face ao centro da armadura,
+            já incluindo cobrimento, estribo e posição das barras. O modelo mantém
+            o mesmo afastamento nas duas faces.</p>
         </div>
       </section>
 
       <section class="grupo aberto sem-linha">
-        <h2 class="cab cab-azul">Esforço solicitante (tfm)</h2>
+        <h2 class="cab cab-azul">Esforço solicitante</h2>
         <div class="corpo">
+          <div class="campo unidade-momento">
+            <label for="unidadeMomento">Unidade</label>
+            <select id="unidadeMomento" aria-describedby="notaUnidade">
+              <option value="tfm">tf·m</option><option value="knm">kN·m</option>
+            </select>
+          </div>
           <div class="esforco-cab">
             <span>M<sub>sd</sub></span><span>=</span><span>M<sub>sk</sub></span>
             <span>x</span><span>γ<sub>f</sub></span>
@@ -131,6 +157,8 @@
             <span class="op">x</span>
             <input type="number" id="gammaF" value="1.4" step="0.05" min="1">
           </div>
+          <p class="nota" id="notaUnidade">Conversão legada: 1 tf·m = 10 kN·m.
+            Trocar a unidade converte os valores; não altera o caso de carga.</p>
         </div>
       </section>
 
@@ -202,7 +230,7 @@
           <div class="campo campo-larga">
             <label>M<sub>d,mín</sub></label>
             <output id="outMdMin" class="amarelo saida"></output>
-            <span class="un">tfm</span>
+            <span class="un" data-unidade-momento>tf·m</span>
           </div>
         </div>
       </section>
@@ -214,29 +242,20 @@
             <input type="checkbox" id="usarDupla" checked> Permitir armadura dupla
           </label>
           <div class="campo">
-            <label for="dl">d'</label>
-            <input type="number" id="dl" value="4" step="0.5" min="0">
-            <span class="un">cm</span>
-          </div>
-          <div class="campo">
             <label for="betaXLim">β<sub>x,lim</sub></label>
             <input type="number" id="betaXLim" value="0.45" step="0.01" min="0.05" max="1">
             <span class="un"></span>
           </div>
-          <p class="nota">h = d + d'</p>
+          
         </div>
       </section>
 
       <section class="grupo aberto">
-        <h2 class="cab"><span class="chev"></span>Identificação e exportação</h2>
+        <h2 class="cab"><span class="chev"></span>Elemento e exportação</h2>
         <div class="corpo">
           <div class="campo campo-id">
-            <label for="idProjeto">Projeto</label>
-            <input type="text" id="idProjeto" maxlength="60" placeholder="nome do projeto">
-          </div>
-          <div class="campo campo-id">
             <label for="idElemento">Elemento</label>
-            <input type="text" id="idElemento" maxlength="60" placeholder="V1, P3…">
+            <input type="text" id="idElemento" maxlength="120" placeholder="Título do elemento">
           </div>
           <div class="export-botoes">
             <button type="button" class="botao botao-mini" id="btBaixarImagem">Baixar imagem</button>
@@ -244,8 +263,8 @@
           </div>
           <p class="export-aviso" id="exportAviso" role="status"></p>
           <p class="nota">
-            Gera um PNG da folha de resultados desta aba, com a identificação
-            acima — pronto para colar no memorial de cálculo.
+            Exporta o painel em três colunas, com a linha ELEMENTO e os dados
+            do cálculo — PNG 2000 px ou SVG, largura nominal de 165 mm.
           </p>
         </div>
       </section>
@@ -253,14 +272,26 @@
     </aside>
 
     <!-- ------------------------------------------------ relatorio -->
-    <main class="relatorio" id="relatorio"
+    <main class="relatorio" id="relatorio" data-layout="painel"
           data-descricao="Dimensionamento armaduras longitudinais em concreto armado.">
-      <div class="faixa"><span class="marca">Flexo Simples</span></div>
-
-      <h1>Flexão simples</h1>
-
+      <h1 class="somente-leitura">Flexão simples</h1>
+      <div id="painelResumo" class="painel-svg" aria-live="polite"></div>
+      <details id="detalhesMemorial" class="detalhes-memorial">
+        <summary>Dados do cálculo e gráficos ampliados</summary>
+        <div id="relatorioTexto">
+          <div id="repAvisos"></div>
+      <h2>Dados</h2>
+      <h3>Informações gerais</h3>
+      <div class="bloco" id="repGeral"></div>
+      <h3>Geometria</h3>
+      <div class="bloco" id="repGeometria"></div>
+      <h3>Materiais</h3>
+      <div class="bloco" id="repMateriais"></div>
+      <h3>Esforços</h3>
+      <div class="bloco" id="repEsforcos"></div>
+      <hr>
       <h2>Resultados</h2>
-      <div id="repAvisos"></div>
+
       <div class="bloco" id="repResultados"></div>
 
       <h2>Armadura</h2>
@@ -274,20 +305,9 @@
       <div class="figura" id="repDominios"></div>
       <hr>
 
-      <h2>Dados</h2>
-      <h3>Informações gerais</h3>
-      <div class="bloco" id="repGeral"></div>
-      <h3>Geometria</h3>
-      <div class="bloco" id="repGeometria"></div>
-      <h3>Materiais</h3>
-      <div class="bloco" id="repMateriais"></div>
-      <h3>Esforços</h3>
-      <div class="bloco" id="repEsforcos"></div>
-      <hr>
-      <p class="rodape">
-        Ferramenta livre de cálculo de flexão simples segundo a ABNT NBR 6118.
-        Os resultados devem ser conferidos por profissional habilitado.
-      </p>
+        </div>
+      </details>
+      <p class="rodape">Ferramenta de cálculo de seção. Conferir os resultados por profissional habilitado.</p>
     </main>
 
   </div>
@@ -297,6 +317,8 @@
 <script src="js/flexao.js"></script>
 <script src="js/desenho-equilibrio.js"></script>
 <script src="js/desenho-dominios.js"></script>
+<script src="js/entrada-flexao.js"></script>
+<script src="js/painel-flexao.js"></script>
 <script src="js/app.js"></script>
 <script src="js/exportar.js"></script>
 <script src="js/tema.js"></script>

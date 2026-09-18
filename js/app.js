@@ -7,6 +7,14 @@
   var Flexao = window.FS.Flexao;
   var Eq = window.FS.DesenhoEquilibrio;
   var Dom = window.FS.DesenhoDominios;
+  var Entrada = window.FS.EntradaFlexao;
+  var Painel = window.FS.PainelFlexao;
+  var ultimoResultado = null;
+  var unidadeAnterior = 'tfm';
+  function unidade() { return $('unidadeMomento').value; }
+  function momento(v) { return Entrada.doMotor(v, unidade()); }
+  function rotuloMomento() { return Entrada.rotulo(unidade()); }
+  function preciso(v) { return Number.isFinite(v) ? String(Number(v.toPrecision(14))) : ''; }
 
   var BITOLAS = [5.0, 6.3, 8.0, 10.0, 12.5, 16.0, 20.0, 25.0, 32.0, 40.0];
 
@@ -53,9 +61,10 @@
       bw: val('bw'),
       bf: val('bf'),
       hf: val('hf'),
-      d: val('d'),
-      dl: val('dl'),
-      Msd: val('msd'),
+      h: Entrada.numero($('h').value),
+      d: Entrada.numero($('d').value),
+      dl: Entrada.numero($('dl').value),
+      Msd: Entrada.paraMotor($('msd').value, unidade()),
       As: areaAsAtual(),
       Asl: val('aslArea'),
       betaXLim: val('betaXLim'),
@@ -66,6 +75,7 @@
 
   function entradaValida(e) {
     var erros = [];
+    if (!Entrada.coerente(e)) erros.push('Informe geometria coerente: h = d + d′, com h e d positivos e 0 ≤ d′ &lt; d.');
     if (!(e.bw > 0)) erros.push('Informe b<sub>w</sub> maior que zero.');
     if (!(e.d > 0)) erros.push('Informe d maior que zero.');
     if (!(e.fck > 0)) erros.push('Informe f<sub>ck</sub> maior que zero.');
@@ -79,7 +89,7 @@
     if (e.fck > 90 || (e.fck > 0 && e.fck < 10)) erros.push('f<sub>ck</sub> deve estar na faixa implementada: 10 a 90 MPa.');
     if (!(e.gammaF > 0)) erros.push('Informe γ<sub>f</sub> maior que zero.');
     if (!(e.dl >= 0 && e.dl < e.d)) erros.push('Informe 0 ≤ d′ &lt; d.');
-    if (e.Msd < 0 || !$('msd').value.trim()) erros.push('Informe a magnitude não negativa do momento e oriente a seção para a face comprimida.');
+    if (!Number.isFinite(e.Msd) || e.Msd < 0 || !$('msd').value.trim()) erros.push('Informe a magnitude não negativa do momento e oriente a seção para a face comprimida.');
     if (e.As < 0 || e.Asl < 0) erros.push('As áreas de armadura não podem ser negativas.');
     return erros;
   }
@@ -89,10 +99,11 @@
   function estadoRelatorio(valido) {
     var rel = $('relatorio');
     rel.setAttribute('data-calculo-valido', String(valido));
-    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg'].forEach(function (id) {
+    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg', 'btExportarPainel'].forEach(function (id) {
       var b = $(id); if (b) b.disabled = !valido;
     });
     if (!valido) {
+      ultimoResultado = null;
       rel.querySelectorAll('.bloco, .figura').forEach(function (b) { b.innerHTML = ''; });
       document.querySelectorAll('.painel output').forEach(function (o) { o.textContent = '—'; });
     }
@@ -119,8 +130,8 @@
     var r = Flexao.verificar(e);
     atualizando = true;
     set('asArea', dec(r.As, 2));
-    set('msd', dec(r.MRdTfm, 2));
-    set('msk', dec(r.MRdTfm / (e.gammaF || 1), 2));
+    set('msd', preciso(momento(r.MRdTfm)));
+    set('msk', preciso(momento(r.MRdTfm) / (e.gammaF || 1)));
     atualizando = false;
     render(r, []);
   }
@@ -169,12 +180,15 @@
   function render(r, erros) {
     if (erros && erros.length) {
       estadoRelatorio(false);
+      Painel.atualizar(null, erros);
       escreve('repAvisos', erros.map(function (m) {
         return '<p class="aviso">' + m + '</p>';
       }).join(''));
       return;
     }
     estadoRelatorio(true);
+    ultimoResultado = r;
+    Painel.atualizar(r);
     escreve('repAvisos', (r.avisos || []).map(function (m) {
       return '<p class="aviso">' + m + '</p>';
     }).join(''));
@@ -227,17 +241,17 @@
       '<p>f<sub>ctk</sub> = ' + dec(r.fctkSup, 2) + ' MPa</p>');
 
     escreve('repEsforcos', r.modo === 'AS_MRD'
-      ? '<p>M<sub>Rd</sub> = ' + dec(r.MRdTfm, 2) + ' tfm</p>' +
+      ? '<p>M<sub>Rd</sub> = ' + dec(momento(r.MRdTfm), 2) + ' ' + rotuloMomento() + '</p>' +
         '<p>Modo inverso: determinação de capacidade, não comparação com uma demanda independente.</p>'
-      : '<p>M<sub>sk</sub> = ' + dec(r.MsdTfm / r.gammaF, 2) + ' tfm</p>' +
+      : '<p>M<sub>sk</sub> = ' + dec(momento(r.MsdTfm / r.gammaF), 2) + ' ' + rotuloMomento() + '</p>' +
         '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>' +
-        '<p>M<sub>Sd</sub> = ' + dec(r.MsdTfm, 2) + ' tfm</p>');
+        '<p>M<sub>Sd</sub> = ' + dec(momento(r.MsdTfm), 2) + ' ' + rotuloMomento() + '</p>');
 
     /* --- painel de armadura minima --- */
     escreveTexto('outRhoMin', dec(r.rhoMin * 100, 3));
     escreveTexto('outAsMin', dec(r.asMin, 2));
     escreveTexto('outAsMax', dec(r.asMax, 2));
-    escreveTexto('outMdMin', dec(r.MdMinTfm, 2));
+    escreveTexto('outMdMin', dec(momento(r.MdMinTfm), 2));
   }
 
   /* ------------------------------------------------ ligacoes da interface */
@@ -254,9 +268,9 @@
   function sincronizarMomentos(origem) {
     var gf = val('gammaF') || 1;
     if (origem === 'msk' || origem === 'gammaF') {
-      set('msd', dec(val('msk') * gf, 2));
+      set('msd', preciso(Entrada.numero($('msk').value) * gf));
     } else {
-      set('msk', dec(val('msd') / gf, 2));
+      set('msk', preciso(Entrada.numero($('msd').value) / gf));
     }
   }
 
@@ -268,8 +282,44 @@
       });
     });
 
+    // Afastamento d′ mantido ao editar h/d. Valores incoerentes nao sao limitados silenciosamente.
+    ['h', 'd', 'dl'].forEach(function (id) {
+      $(id).addEventListener('input', function () {
+        var g = Entrada.sincronizar({h: $('h').value, d: $('d').value, dl: $('dl').value}, id);
+        if (id === 'd' && Number.isFinite(g.h)) set('h', preciso(g.h));
+        if (id !== 'd' && Number.isFinite(g.d)) set('d', preciso(g.d));
+        dimensionar();
+      });
+    });
+    $('unidadeMomento').addEventListener('change', function () {
+      var nova = unidade();
+      ['msd', 'msk'].forEach(function (id) {
+        var v = Entrada.converter($(id).value, unidadeAnterior, nova);
+        if (Number.isFinite(v)) set(id, preciso(v));
+      });
+      unidadeAnterior = nova;
+      document.querySelectorAll('[data-unidade-momento]').forEach(function (e) {e.textContent = rotuloMomento();});
+      // Trocar a unidade e uma operacao de apresentacao: nao redimensiona nem perde a escolha de barras.
+      if (ultimoResultado) render(ultimoResultado, []); else dimensionar();
+    });
+    function focar(id) {
+      var alvo = $(id), grupo = alvo.closest('.grupo');
+      if (grupo) grupo.classList.add('aberto');
+      alvo.focus(); alvo.scrollIntoView({block: 'nearest'});
+    }
+    document.querySelectorAll('[data-foco]').forEach(function (b) {
+      b.addEventListener('click', function () { focar(b.getAttribute('data-foco')); });
+    });
+    $('btRecalcular').addEventListener('click', dimensionar);
+    $('btExportarPainel').addEventListener('click', function () { window.FS.Exportar.copiar(); });
+    document.addEventListener('keydown', function (ev) {
+      var campos = {F2: 'bw', F3: 'fck', F4: 'asArea', F5: 'msd'};
+      if (campos[ev.key]) {ev.preventDefault(); focar(campos[ev.key]);}
+      if (ev.key === 'F9') {ev.preventDefault(); dimensionar();}
+    });
+
     /* entradas que levam ao dimensionamento */
-    ['fyk', 'tipoAco', 'gammaS', 'gammaC', 'fck', 'bw', 'bf', 'hf', 'd', 'dl',
+    ['fyk', 'tipoAco', 'gammaS', 'gammaC', 'fck', 'bw', 'bf', 'hf',
       'betaXLim', 'norma'].forEach(function (id) {
       $(id).addEventListener('input', dimensionar);
       $(id).addEventListener('change', dimensionar);
