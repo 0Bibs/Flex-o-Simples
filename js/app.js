@@ -76,8 +76,26 @@
       if (!(e.hf > 0)) erros.push('Na seção T, informe h<sub>f</sub> maior que zero.');
       if (e.hf >= e.d + e.dl) erros.push('h<sub>f</sub> deve ser menor que a altura da seção.');
     }
-    if (e.fck > 90) erros.push('A NBR 6118 cobre concretos até C90.');
+    if (e.fck > 90 || (e.fck > 0 && e.fck < 10)) erros.push('f<sub>ck</sub> deve estar na faixa implementada: 10 a 90 MPa.');
+    if (!(e.gammaF > 0)) erros.push('Informe γ<sub>f</sub> maior que zero.');
+    if (!(e.dl >= 0 && e.dl < e.d)) erros.push('Informe 0 ≤ d′ &lt; d.');
+    if (e.Msd < 0 || !$('msd').value.trim()) erros.push('Informe a magnitude não negativa do momento e oriente a seção para a face comprimida.');
+    if (e.As < 0 || e.Asl < 0) erros.push('As áreas de armadura não podem ser negativas.');
     return erros;
+  }
+
+  /* A imagem deve corresponder a um calculo valido, nunca ao ultimo
+     resultado que sobrou na tela antes de uma entrada incorreta. */
+  function estadoRelatorio(valido) {
+    var rel = $('relatorio');
+    rel.setAttribute('data-calculo-valido', String(valido));
+    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg'].forEach(function (id) {
+      var b = $(id); if (b) b.disabled = !valido;
+    });
+    if (!valido) {
+      rel.querySelectorAll('.bloco, .figura').forEach(function (b) { b.innerHTML = ''; });
+      document.querySelectorAll('.painel output').forEach(function (o) { o.textContent = '—'; });
+    }
   }
 
   /* ------------------------------------------------ calculo e render */
@@ -150,11 +168,13 @@
 
   function render(r, erros) {
     if (erros && erros.length) {
+      estadoRelatorio(false);
       escreve('repAvisos', erros.map(function (m) {
         return '<p class="aviso">' + m + '</p>';
       }).join(''));
       return;
     }
+    estadoRelatorio(true);
     escreve('repAvisos', (r.avisos || []).map(function (m) {
       return '<p class="aviso">' + m + '</p>';
     }).join(''));
@@ -185,7 +205,10 @@
     escreve('repDominios', Dom.desenhar(r));
 
     /* --- dados --- */
-    escreve('repGeral', '<p>Norma utilizada: NBR-6118:' + $('norma').value + '</p>');
+    escreve('repGeral', '<p>Norma utilizada: NBR-6118:' + $('norma').value + '</p>' +
+      '<p>Operação: ' + (r.modo === 'AS_MRD' ? 'momento resistente a partir da armadura' :
+        'armadura a partir do momento solicitante') + '</p>' +
+      '<p>Convenção de unidades do motor: 1 tf = 10 kN.</p>');
 
     var geo = '<p>b<sub>w</sub> = ' + num(r.bw) + ' cm</p>';
     if (r.secaoT) {
@@ -203,8 +226,12 @@
       '<p>γ<sub>s</sub> = ' + dec(r.gammaS, 2) + '</p>' +
       '<p>f<sub>ctk</sub> = ' + dec(r.fctkSup, 2) + ' MPa</p>');
 
-    escreve('repEsforcos', '<p>M<sub>sk</sub> = ' + dec(r.MsdTfm / (r.gammaF || 1), 2) + ' tfm</p>' +
-      '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>');
+    escreve('repEsforcos', r.modo === 'AS_MRD'
+      ? '<p>M<sub>Rd</sub> = ' + dec(r.MRdTfm, 2) + ' tfm</p>' +
+        '<p>Modo inverso: determinação de capacidade, não comparação com uma demanda independente.</p>'
+      : '<p>M<sub>sk</sub> = ' + dec(r.MsdTfm / r.gammaF, 2) + ' tfm</p>' +
+        '<p>γ<sub>f</sub> = ' + dec(r.gammaF, 2) + '</p>' +
+        '<p>M<sub>Sd</sub> = ' + dec(r.MsdTfm, 2) + ' tfm</p>');
 
     /* --- painel de armadura minima --- */
     escreveTexto('outRhoMin', dec(r.rhoMin * 100, 3));

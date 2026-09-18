@@ -26,7 +26,11 @@
   var INSET_FIG = 10;           /* respiro lateral das figuras */
   var FONTE_DESENHO = 12;       /* '.dg text' — a legenda dentro dos desenhos */
   var ALVO_LEGENDA = 15;        /* como ela deve sair, em unidades da folha */
-  var ESCALA = 2;               /* rasteriza em 2x: fica nitido impresso */
+  var VERSAO = '1.1.0';
+  var LARGURA_MM = 165;
+  var LARGURA_PNG = 2000;
+  var ESCALA = LARGURA_PNG / LARG;
+  FS.VERSAO = VERSAO;
   var CHAVE_ID = 'flexo-simples-identificacao';
 
   /* barra: fundo do cabecalho · marca: a palavra SIMPLES · filete: a linha
@@ -111,8 +115,8 @@
         var cl = f.classList;
         anda(f, sub || f.tagName === 'SUB', forte || f.tagName === 'B' ||
           f.tagName === 'STRONG',
-          marca || (cl && (cl.contains('marca-min') || cl.contains('marca-ok'))
-            ? (cl.contains('marca-min') ? 'min' : 'ok') : marca));
+          marca || (cl && (cl.contains('marca-min') || cl.contains('marca-ok') || cl.contains('marca-ruim'))
+            ? (cl.contains('marca-min') ? 'min' : (cl.contains('marca-ruim') ? 'ruim' : 'ok')) : marca));
       });
     })(p, false, false, null);
     /* junta os espacos das bordas, que vem da indentacao do HTML */
@@ -130,7 +134,7 @@
     return segs.map(function (g) { return g.t; }).join('');
   }
 
-  var CORES_MARCA = { min: '#8a6300', ok: '#1a7f37' };
+  var CORES_MARCA = { min: '#8a6300', ok: '#1a7f37', ruim: '#b00020' };
 
   /* Monta o <text> com os pedacos. O dy de um tspan desloca a posicao
      corrente e nao volta sozinho, entao cada troca de nivel emite o
@@ -149,7 +153,7 @@
          depois de um separador, que e o que a folha tem de equivalente */
       if (g.marca) atr += ' fill="' + CORES_MARCA[g.marca] + '"';
       s += '<tspan' + atr + ' xml:space="preserve">' +
-        esc(g.marca ? ' · ' + g.t.trim() : g.t) + '</tspan>';
+        esc(g.marca && !g.decorada ? ' · ' + g.t.trim() : g.t) + '</tspan>';
     });
     return s + '</text>';
   }
@@ -173,6 +177,91 @@
   function txt(x, y, tam, cor, conteudo, extra) {
     return '<text x="' + n(x) + '" y="' + n(y) + '" font-size="' + tam + '" fill="' + cor +
       '"' + (extra || '') + '>' + esc(conteudo) + '</text>';
+  }
+
+  /* Quebra texto sem reduzir a fonte. Mantem subscritos e destaques e
+     tambem divide identificadores extensos sem espacos. */
+  function quebrarSegmentos(segs, tam, largura) {
+    if (!(largura > 0)) throw new Error('Largura de texto inválida.');
+    var linhas = [], linha = [], usada = 0;
+    function fechar() {
+      while (linha.length && !linha[linha.length - 1].t.trim()) linha.pop();
+      if (linha.length) linhas.push(linha);
+      linha = []; usada = 0;
+    }
+    function colocar(t, g) {
+      if (!linha.length && !t.trim()) return;
+      var w = medir(t, g.sub ? tam * 0.74 : tam) * (g.forte ? 1.08 : 1);
+      if (usada + w > largura && linha.length) fechar();
+      if (!linha.length && !t.trim()) return;
+      if (w > largura && Array.from(t).length > 1) {
+        Array.from(t).forEach(function (letra) { colocar(letra, g); });
+        return;
+      }
+      var novo = Object.assign({}, g, { t: t, decorada: true });
+      var anterior = linha[linha.length - 1];
+      if (anterior && anterior.sub === novo.sub && anterior.forte === novo.forte &&
+          anterior.marca === novo.marca) anterior.t += t;
+      else linha.push(novo);
+      usada += w;
+    }
+    segs.forEach(function (g) {
+      var texto = g.marca && !g.decorada ? ' · ' + g.t.trim() : g.t;
+      (texto.match(/\s+|\S+/g) || []).forEach(function (t) { colocar(t, g); });
+    });
+    fechar();
+    return linhas.length ? linhas : [[]];
+  }
+
+  function quebrarTexto(texto, tam, largura) {
+    return quebrarSegmentos([{ t: String(texto) }], tam, largura).map(planoDe);
+  }
+
+  /* Reordena apenas o documento de exportacao, nunca o DOM da tela.
+     Grupos novos/desconhecidos continuam presentes e em ordem estavel. */
+  function ordenarBlocos(blocos, ordem) {
+    if (ordem === 'tela') return blocos.slice();
+    function grupos(lista, nivel) {
+      var out = [], atual;
+      lista.forEach(function (b) {
+        if (!atual || (b.tipo === 'titulo' && b.nivel === nivel)) {
+          atual = { nome: b.tipo === 'titulo' && b.nivel === nivel ? b.texto : '', itens: [] };
+          out.push(atual);
+        }
+        atual.itens.push(b);
+      });
+      return out;
+    }
+    function ordenar(lista, nomes) {
+      return lista.map(function (g, i) {
+        var p = nomes.indexOf(g.nome);
+        return { g: g, i: i, p: p < 0 ? nomes.length : p };
+      }).sort(function (a, b) { return a.p - b.p || a.i - b.i; })
+        .map(function (x) { return x.g; });
+    }
+    var secoes = grupos(blocos, 2);
+    secoes.forEach(function (g) {
+      if (g.nome !== 'Dados') return;
+      var titulo = g.itens[0];
+      var partes = ordenar(grupos(g.itens.slice(1), 3),
+        ['Informações gerais', 'Materiais', 'Geometria', 'Esforços']);
+      g.itens = [titulo].concat.apply([titulo], partes.map(function (x) { return x.itens; }));
+    });
+    var ordenados = ordenar(secoes, ['Dados', 'Equilíbrio', 'Deformação/Domínios',
+      'Seção', 'Seção vazada equivalente', 'Bielas comprimidas', 'Resultados', 'Armadura']);
+    return [].concat.apply([], ordenados.map(function (g) { return g.itens; }));
+  }
+
+  function ordemAtual() {
+    var el = document.getElementById('exportOrdem');
+    return el && el.value === 'tela' ? 'tela' : 'memorial';
+  }
+
+  function conferirRelatorio() {
+    var rel = document.getElementById('relatorio');
+    if (!rel || (rel.getAttribute && rel.getAttribute('data-calculo-valido') === 'false')) {
+      throw new Error('Corrija as entradas antes de exportar. Não há cálculo válido.');
+    }
   }
 
   /* ------------------------------------------------ identificacao */
@@ -281,8 +370,10 @@
   }
 
   /* ------------------------------------------------ montagem da folha */
-  function montarSvg() {
+  function montarSvg(opcoes) {
+    conferirRelatorio();
     var dados = coletar();
+    dados.blocos = ordenarBlocos(dados.blocos, (opcoes && opcoes.ordem) || ordemAtual());
     var id = lerIdentificacao();
     var tema = document.documentElement.getAttribute('data-tema') === 'corporativo'
       ? 'corporativo' : 'classico';
@@ -305,17 +396,21 @@
       ['Projeto', id.projeto || '—'],
       ['Elemento', id.elemento || '—']
     ];
-    var altId = 46 + Math.ceil(linhasId.length / 2) * 27;
+    var textosId = linhasId.map(function (par) {
+      return quebrarTexto(par[1], 15, LARG - 2 * MARG - 145);
+    });
+    var altId = 48 + textosId.reduce(function (a, ls) { return a + ls.length * 22 + 8; }, 0);
     corpo += '<rect x="' + MARG + '" y="' + (y + 20) + '" width="' + (LARG - 2 * MARG) +
       '" height="' + altId + '" fill="#fafafa" stroke="#dcdcdc"/>';
     corpo += '<text x="' + (MARG + 16) + '" y="' + (y + 44) + '" font-size="12.5" ' +
       'letter-spacing="1.6" fill="#8a8a8a">IDENTIFICAÇÃO</text>';
+    var yi = y + 74;
     linhasId.forEach(function (par, i) {
-      var col = i % 2, lin = Math.floor(i / 2);
-      var xi = MARG + 16 + col * ((LARG - 2 * MARG - 32) / 2);
-      var yi = y + 74 + lin * 27;
-      corpo += txt(xi, yi, 14.5, '#7a7a7a', par[0]);
-      corpo += txt(xi + 96, yi, 15, '#1a1a1a', par[1], ' font-weight="600"');
+      corpo += txt(MARG + 16, yi, 14.5, '#7a7a7a', par[0]);
+      textosId[i].forEach(function (linha, j) {
+        corpo += txt(MARG + 112, yi + j * 22, 15, '#1a1a1a', linha, ' font-weight="600"');
+      });
+      yi += textosId[i].length * 22 + 8;
     });
     y += 20 + altId;
 
@@ -323,8 +418,11 @@
     var rel = document.getElementById('relatorio');
     var descricao = rel && rel.getAttribute ? rel.getAttribute('data-descricao') : '';
     if (descricao) {
-      y += 30;
-      corpo += txt(MARG, y, 15, '#5a5a5a', descricao);
+      y += 8;
+      quebrarTexto(descricao, 15, LARG - 2 * MARG).forEach(function (linha) {
+        y += 22;
+        corpo += txt(MARG, y, 15, '#5a5a5a', linha);
+      });
       y += 4;
     }
     y += 18;
@@ -349,39 +447,54 @@
         var porCol = Math.ceil(b.linhas.length / 2);
         var x2 = 0;
         if (b.linhas.length >= 4) {
-          var l1 = maiorLargura(planas.slice(0, porCol), CORPO);
-          var l2 = maiorLargura(planas.slice(porCol), CORPO);
+          var l1 = maiorLargura(planas.slice(0, porCol), CORPO) * 1.08 + 20;
+          var l2 = maiorLargura(planas.slice(porCol), CORPO) * 1.08 + 20;
           if (l1 + 30 + l2 <= util) {
             x2 = Math.min(Math.max(l1 + 30, util * 0.48), util - l2);
           }
         }
         if (!x2) porCol = b.linhas.length;
         y += 12;
-        b.linhas.forEach(function (segs, i) {
-          var col = Math.floor(i / porCol);
-          corpo += textoRico(esq + col * x2, y + (i % porCol) * 25 + 16, CORPO, '#1a1a1a', segs);
-        });
-        y += porCol * 25 + 8;
+        if (x2) {
+          b.linhas.forEach(function (segs, i) {
+            var col = Math.floor(i / porCol);
+            corpo += textoRico(esq + col * x2, y + (i % porCol) * 25 + 16, CORPO, '#1a1a1a', segs);
+          });
+          y += porCol * 25 + 8;
+        } else {
+          b.linhas.forEach(function (segs) {
+            quebrarSegmentos(segs, CORPO, util - 12).forEach(function (linha) {
+              corpo += textoRico(esq, y + 16, CORPO, '#1a1a1a', linha);
+              y += 25;
+            });
+          });
+          y += 8;
+        }
       } else if (b.tipo === 'destaque') {
-        /* a comparacao das areas de armadura: uma linha so, em evidencia */
-        var alt = b.linhas.length * 25 + 14;
+        var linhasDestaque = [].concat.apply([], b.linhas.map(function (segs) {
+          return quebrarSegmentos(segs, CORPO, LARG - 2 * MARG - 35);
+        }));
+        var alt = linhasDestaque.length * 25 + 14;
         y += 14;
         corpo += '<rect x="' + MARG + '" y="' + n(y) + '" width="' + (LARG - 2 * MARG) +
-          '" height="' + alt + '" fill="' + (tema === 'corporativo' ? '#faf6ea' : '#f2f7fc') +
-          '"/>';
+          '" height="' + alt + '" fill="' + (tema === 'corporativo' ? '#faf6ea' : '#f2f7fc') + '"/>';
         corpo += '<rect x="' + MARG + '" y="' + n(y) + '" width="3.5" height="' + alt +
           '" fill="' + c.acento + '"/>';
-        b.linhas.forEach(function (segs, i) {
+        linhasDestaque.forEach(function (segs, i) {
           corpo += textoRico(MARG + 15, y + 25 + i * 25, CORPO, '#1a1a1a', segs);
         });
         y += alt + 8;
       } else if (b.tipo === 'aviso') {
+        var linhasAviso = quebrarTexto(b.texto, 15, LARG - 2 * MARG - 35);
+        var altAviso = linhasAviso.length * 23 + 12;
         y += 14;
         corpo += '<rect x="' + MARG + '" y="' + y + '" width="' + (LARG - 2 * MARG) +
-          '" height="33" fill="#fdf3f3"/>';
-        corpo += '<rect x="' + MARG + '" y="' + y + '" width="3.5" height="33" fill="#c00000"/>';
-        corpo += txt(MARG + 15, y + 22, 15, '#8b0000', b.texto);
-        y += 39;
+          '" height="' + altAviso + '" fill="#fdf3f3"/>';
+        corpo += '<rect x="' + MARG + '" y="' + y + '" width="3.5" height="' + altAviso + '" fill="#c00000"/>';
+        linhasAviso.forEach(function (linha, i) {
+          corpo += txt(MARG + 15, y + 22 + i * 23, 15, '#8b0000', linha);
+        });
+        y += altAviso + 6;
       } else if (b.tipo === 'figura') {
         var vb = enquadrar(b.svg);
         /* Depois do recorte cada desenho tem uma largura util diferente. Se
@@ -405,7 +518,7 @@
       n(y) + '" stroke="#dcdcdc"/>';
     y += 22;
     corpo += txt(MARG, y, 12.5, '#9a9a9a',
-      'Gerado por Flexo Simples em ' + dataDeHoje() +
+      'Flexo Simples v' + VERSAO + ' · ' + dataDeHoje() +
       ' · ABNT NBR 6118 · conferir por profissional habilitado.');
     y += 24;
 
@@ -422,27 +535,90 @@
      data: URL em vez de blob: URL — assim o canvas nao fica "contaminado"
      e o toBlob continua permitido, inclusive com a pagina aberta por
      duplo clique (file://). */
+  function crc32(bytes) {
+    var crc = 0xffffffff;
+    for (var i = 0; i < bytes.length; i++) {
+      crc ^= bytes[i];
+      for (var bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+  }
+
+  /* PNG pHYs: pixels/metro, unidade 1. Preserva o conteudo rasterizado;
+     remove pHYs anteriores e insere um unico chunk antes de IDAT. */
+  function definirDensidade(bytes, larguraPx, larguraMm) {
+    if (!(bytes instanceof Uint8Array) || bytes.length < 33 ||
+        ![137, 80, 78, 71, 13, 10, 26, 10].every(function (v, i) { return bytes[i] === v; })) {
+      throw new Error('PNG inválido.');
+    }
+    if (!Number.isFinite(larguraPx) || !Number.isFinite(larguraMm) ||
+        larguraPx <= 0 || larguraMm <= 0) throw new Error('Dimensões físicas inválidas.');
+    var densidade = Math.round(larguraPx * 1000 / larguraMm);
+    if (densidade < 1 || densidade > 0xffffffff) throw new Error('Densidade fora do intervalo PNG.');
+    var pedacos = [bytes.slice(0, 8)], pos = 8, fim = false, inserido = false;
+    var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    while (pos + 12 <= bytes.length) {
+      var len = view.getUint32(pos), prox = pos + 12 + len;
+      if (prox > bytes.length) throw new Error('PNG truncado.');
+      var tipo = String.fromCharCode.apply(null, bytes.slice(pos + 4, pos + 8));
+      if (pos === 8 && (tipo !== 'IHDR' || len !== 13 || view.getUint32(pos + 8) !== larguraPx)) {
+        throw new Error('Dimensões divergentes do IHDR.');
+      }
+      if (tipo === 'IDAT' && !inserido) {
+        var chunk = new Uint8Array(21), d = new DataView(chunk.buffer);
+        d.setUint32(0, 9); chunk.set([112, 72, 89, 115], 4);
+        d.setUint32(8, densidade); d.setUint32(12, densidade); chunk[16] = 1;
+        d.setUint32(17, crc32(chunk.slice(4, 17)));
+        pedacos.push(chunk); inserido = true;
+      }
+      if (tipo !== 'pHYs') pedacos.push(bytes.slice(pos, prox));
+      pos = prox;
+      if (tipo === 'IEND') { fim = len === 0 && pos === bytes.length; break; }
+    }
+    if (!fim || !inserido) throw new Error('PNG incompleto.');
+    var out = new Uint8Array(pedacos.reduce(function (s, p) { return s + p.length; }, 0));
+    var offset = 0;
+    pedacos.forEach(function (p) { out.set(p, offset); offset += p.length; });
+    return out;
+  }
+
   function paraBlob(svg, escala) {
     return new Promise(function (ok, falha) {
       var m = /^<svg[^>]*\swidth="(\d+)"\sheight="(\d+)"/.exec(svg);
-      if (!m) { falha(new Error('folha sem dimensões')); return; }
-      var w = Number(m[1]), h = Number(m[2]);
+      if (!m) { falha(new Error('Folha sem dimensões.')); return; }
+      var fator = escala === undefined ? ESCALA : escala;
+      var w = Math.round(Number(m[1]) * fator), h = Math.round(Number(m[2]) * fator);
+      if (!Number.isFinite(w) || !Number.isFinite(h) || w < 1 || h < 1 ||
+          w > 16384 || h > 16384 || w * h > 40000000) {
+        falha(new Error('Folha excede o limite de rasterização; use o SVG.')); return;
+      }
       var img = new Image();
       img.onload = function () {
-        var cv = document.createElement('canvas');
-        cv.width = Math.round(w * escala);
-        cv.height = Math.round(h * escala);
-        var ctx = cv.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, cv.width, cv.height);
-        ctx.drawImage(img, 0, 0, cv.width, cv.height);
-        cv.toBlob(function (b) {
-          if (b) ok(b); else falha(new Error('não consegui gerar o PNG'));
-        }, 'image/png');
+        try {
+          var cv = document.createElement('canvas');
+          cv.width = w; cv.height = h;
+          var ctx = cv.getContext('2d');
+          if (!ctx) throw new Error('Canvas indisponível.');
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          cv.toBlob(function (b) {
+            if (!b) { falha(new Error('Não foi possível gerar o PNG.')); return; }
+            b.arrayBuffer().then(function (buffer) {
+              ok(new Blob([definirDensidade(new Uint8Array(buffer), w, LARGURA_MM)], { type: 'image/png' }));
+            }).catch(falha);
+          }, 'image/png');
+        } catch (e) { falha(e); }
       };
-      img.onerror = function () { falha(new Error('não consegui desenhar a folha')); };
+      img.onerror = function () { falha(new Error('Não foi possível desenhar a folha.')); };
       img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     });
+  }
+
+  function svgFisico(svg) {
+    var m = /^<svg[^>]*\swidth="(\d+)"\sheight="(\d+)"/.exec(svg);
+    if (!m) throw new Error('Folha sem dimensões.');
+    return svg.replace('width="' + m[1] + '" height="' + m[2] + '"',
+      'width="' + LARGURA_MM + 'mm" height="' + n(Number(m[2]) / Number(m[1]) * LARGURA_MM) + 'mm"');
   }
 
   function nomeArquivo() {
@@ -464,49 +640,128 @@
     aviso.t = setTimeout(function () { el.textContent = ''; el.className = 'export-aviso'; }, 5000);
   }
 
-  function baixar() {
-    guardarIdentificacao();
-    return paraBlob(montarSvg(), ESCALA).then(function (blob) {
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = nomeArquivo();
-      document.body.appendChild(a);
-      a.click();
+  var ocupado = false;
+  function definirOcupado(valor) {
+    ocupado = valor;
+    var rel = document.getElementById('relatorio');
+    var invalido = rel && rel.getAttribute('data-calculo-valido') === 'false';
+    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg'].forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) { b.disabled = valor || invalido; b.setAttribute('aria-busy', String(valor)); }
+    });
+  }
+
+  function salvarBlob(blob, nome) {
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    try {
+      a.href = url; a.download = nome;
+      document.body.appendChild(a); a.click();
+    } finally {
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      aviso('Imagem salva.');
-    }).catch(function (e) { aviso('Não deu certo: ' + e.message, true); });
+    }
+  }
+
+  function baixar() {
+    if (ocupado) return Promise.resolve();
+    definirOcupado(true); guardarIdentificacao();
+    var nome = nomeArquivo();
+    return Promise.resolve().then(function () { return paraBlob(montarSvg()); })
+      .then(function (blob) {
+        salvarBlob(blob, nome);
+        aviso('PNG gerado: 2000 px, largura nominal de 16,5 cm.');
+      }).catch(function (e) { aviso('Não foi possível exportar: ' + e.message, true); })
+      .finally(function () { definirOcupado(false); });
+  }
+
+  function baixarSvg() {
+    if (ocupado) return;
+    try {
+      guardarIdentificacao();
+      salvarBlob(new Blob([svgFisico(montarSvg())], { type: 'image/svg+xml;charset=utf-8' }),
+        nomeArquivo().replace(/\.png$/, '.svg'));
+      aviso('SVG vetorial gerado com largura nominal de 16,5 cm.');
+    } catch (e) { aviso('Não foi possível exportar: ' + e.message, true); }
   }
 
   function copiar() {
+    if (ocupado) return Promise.resolve();
     guardarIdentificacao();
     if (!navigator.clipboard || !navigator.clipboard.write || !root.ClipboardItem) {
       aviso('Este navegador não copia imagem — use "Baixar imagem".', true);
       return Promise.resolve();
     }
-    return paraBlob(montarSvg(), ESCALA).then(function (blob) {
-      return navigator.clipboard.write([new root.ClipboardItem({ 'image/png': blob })]);
-    }).then(function () {
-      aviso('Copiada. Cole no Word com Ctrl+V.');
-    }).catch(function (e) {
-      aviso('Não consegui copiar (' + e.message + '). Use "Baixar imagem".', true);
-    });
+    definirOcupado(true);
+    var imagem;
+    try {
+      conferirRelatorio();
+      imagem = paraBlob(montarSvg());
+      /* A chamada de write acontece dentro do clique, nao depois do canvas.
+         A Promise do ClipboardItem preserva a ativacao do usuario. */
+      imagem.catch(function () { /* tratado pela cadeia abaixo */ });
+      return navigator.clipboard.write([new root.ClipboardItem({ 'image/png': imagem })])
+        .then(function () {
+          aviso('Copiada. No Word, confira a largura de 16,5 cm após colar.');
+        }).catch(function (e) {
+          aviso('Não foi possível copiar (' + e.message + '). Use "Baixar imagem".', true);
+        }).finally(function () { definirOcupado(false); });
+    } catch (e) {
+      definirOcupado(false);
+      aviso('Não foi possível copiar: ' + e.message, true);
+      return Promise.resolve();
+    }
   }
 
   function ligar() {
     var bBaixar = document.getElementById('btBaixarImagem');
     var bCopiar = document.getElementById('btCopiarImagem');
-    if (bBaixar) bBaixar.addEventListener('click', baixar);
+    if (bBaixar) {
+      bBaixar.addEventListener('click', baixar);
+      var painel = bBaixar.parentNode.parentNode;
+      var campo = document.createElement('div');
+      campo.className = 'campo campo-larga';
+      campo.style.display = 'block';
+      var rotulo = document.createElement('label');
+      rotulo.htmlFor = 'exportOrdem'; rotulo.textContent = 'Ordem da folha';
+      rotulo.style.display = 'block'; rotulo.style.width = '100%';
+      var selecao = document.createElement('select');
+      selecao.id = 'exportOrdem';
+      selecao.style.width = '100%'; selecao.style.marginTop = '4px';
+      [['memorial', 'Memorial: dados primeiro'], ['tela', 'Mesma ordem da tela']].forEach(function (par) {
+        var opt = document.createElement('option'); opt.value = par[0]; opt.textContent = par[1]; selecao.appendChild(opt);
+      });
+      campo.appendChild(rotulo); campo.appendChild(selecao);
+      painel.insertBefore(campo, bBaixar.parentNode);
+      var bSvg = document.createElement('button');
+      bSvg.type = 'button'; bSvg.id = 'btBaixarSvg';
+      bSvg.className = 'botao botao-mini'; bSvg.textContent = 'Baixar SVG';
+      bSvg.addEventListener('click', baixarSvg); bBaixar.parentNode.appendChild(bSvg);
+      var nota = document.createElement('p'); nota.className = 'nota';
+      nota.textContent = 'Versão ' + VERSAO + ' · PNG 2000 px · largura nominal 165 mm. ' +
+        'A exportação não altera a ordem da tela. Confira o tamanho após colar no Word.';
+      painel.appendChild(nota);
+    }
     if (bCopiar) bCopiar.addEventListener('click', copiar);
     CAMPOS.forEach(function (c) {
       var el = campoId(c);
       if (el) el.addEventListener('change', guardarIdentificacao);
     });
     restaurarIdentificacao();
+    definirOcupado(false);
+    document.title += ' · v' + VERSAO;
   }
 
   FS.Exportar = {
+    VERSAO: VERSAO,
+    LARGURA_MM: LARGURA_MM,
+    LARGURA_PNG: LARGURA_PNG,
+    ordenarBlocos: ordenarBlocos,
+    quebrarSegmentos: quebrarSegmentos,
+    quebrarTexto: quebrarTexto,
+    definirDensidade: definirDensidade,
+    crc32: crc32,
+    svgFisico: svgFisico,
+    baixarSvg: baixarSvg,
     montarSvg: montarSvg,
     paraBlob: paraBlob,
     baixar: baixar,

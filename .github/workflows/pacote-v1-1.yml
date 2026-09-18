@@ -1,0 +1,31 @@
+name: Pacote da versão 1.1
+
+on:
+  push:
+    branches: ['codex/flexao-simples-v1.1']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pacote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Testes automatizados
+        run: node --test
+      - name: Guardar código para revisão, sem implantação
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexao-simples-v1.1-revisao
+          retention-days: 30
+          path: |
+            .
+            !.git
+            !node_modules
+          include-hidden-files: true
