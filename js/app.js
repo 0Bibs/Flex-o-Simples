@@ -10,7 +10,7 @@
   var Entrada = window.FS.EntradaFlexao;
   var Painel = window.FS.PainelFlexao;
   var ultimoResultado = null;
-  var unidadeAnterior = 'tfm';
+  var unidadeAnterior = unidade();
   function unidade() { return $('unidadeMomento').value; }
   function momento(v) { return Entrada.doMotor(v, unidade()); }
   function rotuloMomento() { return Entrada.rotulo(unidade()); }

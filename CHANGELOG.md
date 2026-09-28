@@ -1,5 +1,12 @@
 # Histórico de versões
 
+## Correção do PR #2 — 28/09/2026
+
+- Rastreador de momento inicializado pela unidade restaurada no seletor.
+- Regressão executa startup e eventos reais de app.js em DOM simulado, com motor real: kN·m → tf·m, sentido inverso, Msd/Msk e recálculo após 100 alternâncias por estado inicial.
+- Antes da correção: caso kN·m falha com 32,2 em vez de 3,22. Depois: 107/107 testes Node aprovados (node --test --test-isolation=none).
+- Cache offline regenerado; motores preservados. Restauração nativa em navegador não exercitada nesta correção.
+
 ## 1.2.0 — 18/09/2026
 
 Painel de flexão em três colunas conforme o documento de orientações. Campos
