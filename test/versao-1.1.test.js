@@ -36,7 +36,7 @@ function chunks(bytes) {
 }
 
 test('1.1: configura a largura nominal e o PNG sem alterar o viewBox', () => {
-  assert.equal(E.VERSAO, '1.1.0'); assert.equal(scope.FS.VERSAO, '1.1.0');
+  assert.equal(E.VERSAO, '1.2.0'); assert.equal(scope.FS.VERSAO, '1.2.0');
   assert.equal(E.LARGURA_MM, 165); assert.equal(E.LARGURA_PNG, 2000);
   const svg = '<svg width="760" height="1520" viewBox="0 0 760 1520"></svg>';
   assert.equal(E.svgFisico(svg), '<svg width="165mm" height="330mm" viewBox="0 0 760 1520"></svg>');

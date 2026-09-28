@@ -1,0 +1,36 @@
+/* Interface classica, inspirada no Pilar CA enviado como referencia.
+   Isolada da aba Cortante/Torcao; o painel SVG usa cores tecnicas proprias. */
+.pagina-flexao {font-family:Tahoma,Arial,sans-serif; background:#e4e4e4; font-size:12px}
+.pagina-flexao .janela {background:#f0f0f0}
+.pagina-flexao .titulo-janela {height:33px;flex-basis:33px}
+.versao-janela {font-size:11px;margin:0 14px;color:inherit;opacity:.8}
+.barra-ferramentas {display:flex;align-items:center;gap:5px;min-height:37px;padding:4px 9px;background:#f0f0f0;border-bottom:1px solid #b8bdc2;flex-shrink:0}
+.barra-ferramentas button {font:12px Tahoma,Arial,sans-serif;color:#262b30;background:#fafafa;border:1px solid #c3c7cb;border-radius:2px;min-height:26px;padding:3px 9px;cursor:pointer}
+.barra-ferramentas button:hover {border-color:#7d9cb5;background:#e7f0f7}
+.barra-ferramentas button:focus-visible {outline:2px solid #286ca6;outline-offset:1px}
+.barra-ferramentas button:disabled {color:#8a8a8a;cursor:default}
+.barra-ferramentas kbd {font:10px Tahoma,Arial,sans-serif;color:#747b81;margin-left:7px}
+.barra-ferramentas .separador {width:1px;height:23px;background:#c8cccf;margin:0 5px}
+.pagina-flexao .painel {flex-basis:274px;width:274px;background:#f7f7f7;padding:10px 12px 20px;border-right:1px solid #b8bdc2}
+.pagina-flexao .grupo {border-color:#d3d6d8}
+.pagina-flexao .cab {font-weight:600;color:#30363a;font-size:12px}
+.pagina-flexao .cab strong {font-weight:700}
+.pagina-flexao .chev {filter:grayscale(1)}
+.pagina-flexao input[type="number"],.pagina-flexao input[type="text"],.pagina-flexao select,.pagina-flexao output.saida {height:23px;font-size:12px;border-color:#aeb4ba;border-radius:0}
+.pagina-flexao .campo {min-height:26px}
+.pagina-flexao .nota {font-size:10.5px;line-height:1.5;color:#596168}
+.pagina-flexao .botao {min-height:27px}
+.pagina-flexao .relatorio {padding:14px 15px 22px;background:#eceeef;overflow:auto}
+.painel-svg {background:#fff;border:1px solid #acb3b8;min-width:750px;max-width:1200px;margin:0 auto}
+.painel-svg>svg {width:100%;height:auto;display:block}
+.detalhes-memorial {margin:14px auto 0;background:#fff;border:1px solid #c7cbce;max-width:1200px}
+.detalhes-memorial>summary {cursor:pointer;padding:9px 12px;font-weight:600;color:#414950;background:#f8f8f8}
+#relatorioTexto {padding:10px 16px}
+#relatorioTexto .figura {max-width:900px}
+.somente-leitura {position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%);margin:-1px!important;padding:0!important;border:0!important}
+.pagina-flexao .rodape {margin:10px auto;max-width:1200px;font-size:10px;color:#647078}
+.pagina-flexao .unidade-momento select {width:106px;margin-left:auto}
+.pagina-flexao .export-botoes {flex-wrap:wrap}
+@media(max-width:1050px){.pagina-flexao .painel{flex-basis:247px;width:247px}.pagina-flexao .relatorio{padding:10px}.painel-svg{min-width:700px}}
+@media(max-width:720px){.barra-ferramentas{flex-wrap:wrap}.barra-ferramentas kbd{display:none}.pagina-flexao .jtitulo{font-size:10px}.pagina-flexao .conteudo{flex-direction:column;overflow:auto}.pagina-flexao .painel{width:100%;flex:0 0 auto;max-height:48vh;border-right:0;border-bottom:1px solid #b8bdc2}.pagina-flexao .relatorio{flex:0 0 auto;overflow-x:auto;min-height:70vh}.pagina-flexao .nota{max-width:580px}}
+@media print{.pagina-flexao .titulo-janela,.barra-ferramentas,.pagina-flexao .painel,.detalhes-memorial,.pagina-flexao .rodape{display:none!important}.pagina-flexao .relatorio{overflow:visible;padding:0;background:#fff}.pagina-flexao .janela,.pagina-flexao .conteudo{display:block;height:auto;border:0}.painel-svg{min-width:0;width:165mm;border:0;margin:0}html,body.pagina-flexao{height:auto}}

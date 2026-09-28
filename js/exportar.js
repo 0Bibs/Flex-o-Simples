@@ -26,7 +26,7 @@
   var INSET_FIG = 10;           /* respiro lateral das figuras */
   var FONTE_DESENHO = 12;       /* '.dg text' — a legenda dentro dos desenhos */
   var ALVO_LEGENDA = 15;        /* como ela deve sair, em unidades da folha */
-  var VERSAO = '1.1.0';
+  var VERSAO = '1.2.0';
   var LARGURA_MM = 165;
   var LARGURA_PNG = 2000;
   var ESCALA = LARGURA_PNG / LARG;
@@ -265,7 +265,7 @@
   }
 
   /* ------------------------------------------------ identificacao */
-  var CAMPOS = ['projeto', 'elemento'];
+  var CAMPOS = ['elemento'];
 
   function campoId(c) {
     return document.getElementById('id' + c.charAt(0).toUpperCase() + c.slice(1));
@@ -372,6 +372,12 @@
   /* ------------------------------------------------ montagem da folha */
   function montarSvg(opcoes) {
     conferirRelatorio();
+    var main = document.getElementById('relatorio');
+    if (main && main.getAttribute && main.getAttribute('data-layout') === 'painel') {
+      if (!FS.PainelFlexao) throw new Error('Painel de flexão indisponível. Recarregue a página.');
+      return FS.PainelFlexao.exportar();
+    }
+    conferirRelatorio();
     var dados = coletar();
     dados.blocos = ordenarBlocos(dados.blocos, (opcoes && opcoes.ordem) || ordemAtual());
     var id = lerIdentificacao();
@@ -391,28 +397,10 @@
     corpo += txt(LARG - MARG, 36, 16.5, c.barraTxt, dados.titulo, ' text-anchor="end"');
     y = 58;
 
-    /* --- identificacao --- */
-    var linhasId = [
-      ['Projeto', id.projeto || '—'],
-      ['Elemento', id.elemento || '—']
-    ];
-    var textosId = linhasId.map(function (par) {
-      return quebrarTexto(par[1], 15, LARG - 2 * MARG - 145);
-    });
-    var altId = 48 + textosId.reduce(function (a, ls) { return a + ls.length * 22 + 8; }, 0);
-    corpo += '<rect x="' + MARG + '" y="' + (y + 20) + '" width="' + (LARG - 2 * MARG) +
-      '" height="' + altId + '" fill="#fafafa" stroke="#dcdcdc"/>';
-    corpo += '<text x="' + (MARG + 16) + '" y="' + (y + 44) + '" font-size="12.5" ' +
-      'letter-spacing="1.6" fill="#8a8a8a">IDENTIFICAÇÃO</text>';
-    var yi = y + 74;
-    linhasId.forEach(function (par, i) {
-      corpo += txt(MARG + 16, yi, 14.5, '#7a7a7a', par[0]);
-      textosId[i].forEach(function (linha, j) {
-        corpo += txt(MARG + 112, yi + j * 22, 15, '#1a1a1a', linha, ' font-weight="600"');
-      });
-      yi += textosId[i].length * 22 + 8;
-    });
-    y += 20 + altId;
+    /* Identificacao resumida: nenhum projeto nem subcapitulo IDENTIFICACAO. */
+    y += 34;
+    var idLinhas = quebrarTexto('ELEMENTO — ' + (id.elemento || 'não informado'), CORPO, LARG - 2 * MARG);
+    idLinhas.forEach(function (t) { corpo += txt(MARG, y, CORPO, '#1a1a1a', t, ' font-weight="600"'); y += 25; });
 
     /* --- o que a folha dimensiona: cada pagina declara a sua frase --- */
     var rel = document.getElementById('relatorio');
@@ -586,7 +574,7 @@
     return new Promise(function (ok, falha) {
       var m = /^<svg[^>]*\swidth="(\d+)"\sheight="(\d+)"/.exec(svg);
       if (!m) { falha(new Error('Folha sem dimensões.')); return; }
-      var fator = escala === undefined ? ESCALA : escala;
+      var fator = escala === undefined ? LARGURA_PNG / Number(m[1]) : escala;
       var w = Math.round(Number(m[1]) * fator), h = Math.round(Number(m[2]) * fator);
       if (!Number.isFinite(w) || !Number.isFinite(h) || w < 1 || h < 1 ||
           w > 16384 || h > 16384 || w * h > 40000000) {
@@ -645,7 +633,7 @@
     ocupado = valor;
     var rel = document.getElementById('relatorio');
     var invalido = rel && rel.getAttribute('data-calculo-valido') === 'false';
-    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg'].forEach(function (id) {
+    ['btBaixarImagem', 'btCopiarImagem', 'btBaixarSvg', 'btExportarPainel'].forEach(function (id) {
       var b = document.getElementById(id);
       if (b) { b.disabled = valor || invalido; b.setAttribute('aria-busy', String(valor)); }
     });
@@ -731,14 +719,15 @@
         var opt = document.createElement('option'); opt.value = par[0]; opt.textContent = par[1]; selecao.appendChild(opt);
       });
       campo.appendChild(rotulo); campo.appendChild(selecao);
-      painel.insertBefore(campo, bBaixar.parentNode);
+      var principal = document.getElementById('relatorio');
+      if (!principal || principal.getAttribute('data-layout') !== 'painel') painel.insertBefore(campo, bBaixar.parentNode);
       var bSvg = document.createElement('button');
       bSvg.type = 'button'; bSvg.id = 'btBaixarSvg';
       bSvg.className = 'botao botao-mini'; bSvg.textContent = 'Baixar SVG';
       bSvg.addEventListener('click', baixarSvg); bBaixar.parentNode.appendChild(bSvg);
       var nota = document.createElement('p'); nota.className = 'nota';
       nota.textContent = 'Versão ' + VERSAO + ' · PNG 2000 px · largura nominal 165 mm. ' +
-        'A exportação não altera a ordem da tela. Confira o tamanho após colar no Word.';
+        'Confira o tamanho após colar no Word.';
       painel.appendChild(nota);
     }
     if (bCopiar) bCopiar.addEventListener('click', copiar);
@@ -747,6 +736,8 @@
       if (el) el.addEventListener('change', guardarIdentificacao);
     });
     restaurarIdentificacao();
+    var campoElemento = document.getElementById('idElemento');
+    if (FS.PainelFlexao && campoElemento) campoElemento.dispatchEvent(new Event('input'));
     definirOcupado(false);
     document.title += ' · v' + VERSAO;
   }
