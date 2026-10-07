@@ -1,0 +1,45 @@
+name: Executavel Flexao Simples RV08 (Windows)
+
+on:
+  push:
+    branches: ['**']
+    paths: ['versao-1.2-rv08/**', '.github/workflows/executavel-rv08.yml']
+  workflow_dispatch:
+
+jobs:
+  exe:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: versao-1.2-rv08
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Testes
+        run: node --test
+
+      - name: Instalar Electron
+        run: npm install --no-audit --no-fund
+
+      - name: Empacotar
+        run: npx electron-builder --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Instalador para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flexao-Simples-RV08-Instalador
+          path: |
+            versao-1.2-rv08/dist/*.exe
+            versao-1.2-rv08/LEIA-ME-INSTALACAO.txt
+
+      - name: Portatil para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flexao-Simples-RV08-Portatil
+          path: versao-1.2-rv08/dist/win-unpacked/

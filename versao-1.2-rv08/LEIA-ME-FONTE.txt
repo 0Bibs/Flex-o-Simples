@@ -1,0 +1,38 @@
+FLEXÃO SIMPLES 1.2.0 — RV08 — CÓDIGO-FONTE
+02/10/2026
+
+CONTEÚDO
+Aplicativo: HTML, CSS, JavaScript, ícones, testes e documentação da ferramenta.
+Inicializador.cs: fonte C# do executável Windows.
+Compilar-executavel.ps1: compilação local do inicializador, com caminhos relativos.
+
+ABRIR SEM COMPILAR
+Abra Aplicativo\index.html no Microsoft Edge ou Google Chrome.
+Não há dependências de Node ou Python para usar a ferramenta.
+
+GERAR O EXECUTÁVEL
+No PowerShell, na pasta extraída, execute:
+  .\Compilar-executavel.ps1
+Requer o compilador do .NET Framework do Windows e não baixa dependências.
+O arquivo Flexão Simples.exe será criado ao lado da pasta Aplicativo.
+Mantenha ambos juntos. O inicializador abre o programa no Edge ou Chrome instalado.
+
+EXECUTAR OS TESTES
+Com Node.js instalado, dentro da pasta Aplicativo, execute:
+  node --test
+No Node que oferece execução sem isolamento por processo, também é possível:
+  node --test --experimental-test-isolation=none
+A revisão foi conferida com 156 testes aprovados.
+
+REVISÃO ATUAL
+Resumo horizontal sem diagramas, com D/C e FS da armadura adotada.
+Descrição atual: Aplicativo\REVISAO-RV08.txt.
+README.md, documentos RV02–RV07 e exemplos anteriores foram preservados como
+histórico. As opções de layout antigas descritas neles não representam a RV08.
+
+Após alterar arquivos da aplicação, atualize a identificação do cache offline:
+  node scripts/atualizar-cache.cjs
+Execute esse comando dentro da pasta Aplicativo e rode novamente os testes.
+
+Os motores e a conversão 10 N = 1 kgf permanecem preservados.
+Licença e atribuições originais: Aplicativo\LICENSE.

@@ -1,0 +1,25 @@
+FLEXÃO SIMPLES 1.2.0 RV08 — PROGRAMA PARA WINDOWS
+
+OPÇÃO A — INSTALADOR (recomendado)
+1. Execute Flexao-Simples-1.2.0-RV08-Instalador.exe.
+   (SmartScreen: "Mais informações" -> "Executar assim mesmo"; o programa não é assinado.)
+2. A pasta já vem sugerida:
+   Área de Trabalho\PADRÃO DE TRABALHO\Ferramentas Padronizadas\CONCRETO ARMADO\Flexão Simples
+   Confirme e conclua. Não exige administrador.
+3. Atalhos: Área de Trabalho e Menu Iniciar ("Flexão Simples").
+   Arquivos .flexo passam a abrir com duplo clique.
+
+OPÇÃO B — PORTÁTIL (sem instalar)
+Extraia Flexao-Simples-1.2.0-RV08-Portatil.zip dentro de
+   ...\PADRÃO DE TRABALHO\Ferramentas Padronizadas\CONCRETO ARMADO
+e abra "Flexão Simples\Flexao Simples.exe".
+
+PROJETOS
+Botões Novo / Abrir / Salvar / Histórico (Ctrl+N, Ctrl+O, Ctrl+S, Ctrl+H).
+Pasta padrão de salvamento:
+   ...\CONCRETO ARMADO\Flexão Simples - Projetos
+(fica fora da pasta do programa: reinstalar/atualizar não apaga projetos).
+Um arquivo .flexo guarda as duas abas (Flexão e Cortante/Torção).
+Trocar de aba não perde dados; tudo volta como estava, inclusive unidades e operação.
+
+Os motores de cálculo da RV08 não foram alterados (166 testes aprovados).
