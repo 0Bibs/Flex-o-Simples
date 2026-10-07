@@ -13,6 +13,11 @@ jobs:
       run:
         working-directory: versao-1.2-rv08
     steps:
+      # sem conversao LF->CRLF: os testes conferem o hash dos arquivos
+      - name: Manter quebras de linha originais
+        run: git config --global core.autocrlf false
+        working-directory: .
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
