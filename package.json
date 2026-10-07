@@ -1,0 +1,48 @@
+{
+  "name": "flexo-simples",
+  "productName": "Flexo Simples",
+  "version": "1.0.0",
+  "description": "Dimensionamento de concreto armado (flexão, cortante e torção) segundo a ABNT NBR 6118",
+  "license": "MIT",
+  "main": "desktop/main.js",
+  "scripts": {
+    "test": "node --test",
+    "app": "electron .",
+    "exe": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "io.github.0bibs.flexosimples",
+    "productName": "Flexo Simples",
+    "files": [
+      "index.html",
+      "cisalhamento/**",
+      "css/**",
+      "js/**",
+      "icons/**",
+      "desktop/**",
+      "LICENSE"
+    ],
+    "fileAssociations": [
+      { "ext": "flexo", "name": "Projeto Flexo Simples", "icon": "icons/flexo-simples.ico" }
+    ],
+    "win": {
+      "icon": "icons/flexo-simples.ico",
+      "target": ["nsis", "portable"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Flexo Simples",
+      "artifactName": "FlexoSimples-Instalador-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "FlexoSimples-Portatil-${version}.exe"
+    },
+    "directories": { "output": "dist" }
+  }
+}

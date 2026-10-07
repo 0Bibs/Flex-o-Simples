@@ -603,3 +603,68 @@ html[data-tema="corporativo"] .bt-tema {
   color: #d6d6d6;
 }
 html[data-tema="corporativo"] .bt-tema:hover { background: #474747; }
+
+/* ----------------------------------------------------- projeto: novo/abrir/salvar/historico */
+.bt-projeto { display: flex; gap: 2px; margin-right: 6px; }
+.bt-projeto button {
+  height: 20px;
+  padding: 0 9px;
+  font: inherit;
+  font-size: 11.5px;
+  color: #4a4a4a;
+  border: 1px solid #dcdcdc;
+  border-radius: 3px;
+  background: #f6f6f6;
+  cursor: pointer;
+}
+.bt-projeto button:hover { background: #ededed; }
+html[data-tema="corporativo"] .bt-projeto button {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+  color: #d6d6d6;
+}
+html[data-tema="corporativo"] .bt-projeto button:hover { background: #474747; }
+
+.dlg-historico {
+  width: min(560px, calc(100vw - 32px));
+  max-height: 80vh;
+  padding: 16px 18px;
+  border: 1px solid #c8c8c8;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+}
+.dlg-historico::backdrop { background: rgba(0, 0, 0, .35); }
+.dlg-historico h3 { margin: 0 0 10px; font-size: 15px; }
+.dlg-historico ul { list-style: none; margin: 0; padding: 0; overflow-y: auto; max-height: 60vh; }
+.dlg-historico li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid #eee;
+}
+.hist-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.hist-info small { color: #777; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-x { border: 0; background: none; font-size: 18px; color: #999; cursor: pointer; }
+.hist-x:hover { color: #c33; }
+.hist-vazio { color: #777; }
+.hist-rodape { margin: 12px 0 0; text-align: right; }
+
+.aviso-projeto {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  font-size: 12.5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.aviso-projeto.visivel { opacity: .95; }
+
+html.desktop .jbotoes { display: none; }

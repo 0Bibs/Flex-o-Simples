@@ -250,5 +250,12 @@
   preencherBitolas();
   ligar();
   calcular();
+
+  /* usado por js/projeto.js para refazer a conta depois de restaurar os campos */
+  window.FS.App = {
+    pagina: 'cisalhamento',
+    ultimaAcao: function () { return 'calcular'; },
+    recalcular: function () { calcular(); }
+  };
   registrarServiceWorker();
 })();

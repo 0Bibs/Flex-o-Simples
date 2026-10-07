@@ -12,6 +12,7 @@
 
   var el = {};
   var atualizando = false;
+  var ultimaAcao = 'dimensionar';
 
   function $(id) { return document.getElementById(id); }
   function val(id) { var v = parseFloat($(id).value.replace(',', '.')); return isNaN(v) ? 0 : v; }
@@ -82,6 +83,7 @@
 
   /* ------------------------------------------------ calculo e render */
   function dimensionar() {
+    ultimaAcao = 'dimensionar';
     var e = entrada();
     var erros = entradaValida(e);
     if (erros.length) return render(null, erros);
@@ -95,6 +97,7 @@
   }
 
   function verificar() {
+    ultimaAcao = 'verificar';
     var e = entrada();
     var erros = entradaValida(e);
     if (erros.length) return render(null, erros);
@@ -297,5 +300,13 @@
   preencherBitolas();
   ligar();
   dimensionar();
+
+  /* usado por js/projeto.js para refazer a conta depois de restaurar os
+     campos, repetindo a ultima acao (dimensionar ou verificar) */
+  window.FS.App = {
+    pagina: 'flexao',
+    ultimaAcao: function () { return ultimaAcao; },
+    recalcular: function (acao) { (acao === 'verificar' ? verificar : dimensionar)(); }
+  };
   registrarServiceWorker();
 })();

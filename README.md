@@ -24,35 +24,48 @@ A ferramenta está publicada em **https://0bibs.github.io/Flex-o-Simples/**.
 O fluxo `.github/workflows/pages.yml` republica o site a cada push na branch
 padrão — não há build, os arquivos vão direto.
 
-### Usar como um programa
+### Programa para Windows (.exe)
 
-Há três caminhos, do mais simples ao mais manual:
+O jeito mais simples: um executável próprio, sem navegador.
 
-**1. Instalar pelo navegador (recomendado).** Veja abaixo — é um clique e dá
-janela própria, ícone no menu iniciar e funcionamento offline.
+1. Em **Actions → Gerar executavel (Windows)**, abra a execução mais recente e baixe
+   o artefato **FlexoSimples-Windows** (ou pegue na página de *Releases*, nas versões
+   marcadas `v*`).
+2. Escolha um dos dois:
+   - `FlexoSimples-Portatil-x.y.z.exe` — roda direto, sem instalar (dá para levar no pendrive);
+   - `FlexoSimples-Instalador-x.y.z.exe` — instala, cria atalho na Área de Trabalho e
+     associa os arquivos `.flexo` ao programa (duplo clique abre o projeto).
+
+> Sem certificado de assinatura digital, o Windows mostra o aviso do SmartScreen
+> na primeira execução: *Mais informações → Executar assim mesmo*.
+
+Para gerar localmente: `npm install` e `npm run exe` (ou `npm run app` para só abrir).
+O código do aplicativo está em `desktop/`; as páginas são as mesmas da versão web.
+
+### Projetos: salvar, abrir e histórico
+
+Na barra de título: **Novo**, **Abrir**, **Salvar** e **Histórico**
+(atalhos `Ctrl+N`, `Ctrl+O`, `Ctrl+S`, `Ctrl+H`).
+
+- **Salvar** grava as duas abas (flexão e cortante/torção) num único arquivo `.flexo`.
+  O nome sugerido vem de *Projeto* e *Elemento*. No programa, a pasta padrão é
+  `Documentos\Flexo Simples`; no navegador, o arquivo é baixado.
+- **Histórico** lista os últimos 40 projetos salvos ou abertos, com data e caminho,
+  e reabre qualquer um com um clique — mesmo que o arquivo tenha sido movido.
+- **Troca de abas não perde dados**: todo campo editado fica guardado e é restaurado
+  ao voltar para a aba, inclusive depois de fechar o programa.
+
+### Outros jeitos de usar
+
+**1. Instalar pelo navegador.** Veja abaixo — janela própria, ícone no menu
+iniciar e funcionamento offline.
 
 **2. Criar um atalho.** Baixe o repositório (*Code → Download ZIP*) e dê duplo
 clique em `atalho/Criar atalho (Windows).cmd` — ou em
-`atalho/Criar atalho corporativo (Windows).cmd`, que usa o tema cinza e amarelo
-e o ícone correspondente. Ele cria um atalho na Área de Trabalho e no Menu
-Iniciar que abre a ferramenta em **modo aplicativo** — janela sem barra de
-endereços nem abas. Não instala nada nem mexe no registro do Windows: só cria
-dois arquivos `.lnk`. Se o `index.html` estiver junto, o atalho aponta para a
-cópia local; senão, para a versão publicada.
+`atalho/Criar atalho corporativo (Windows).cmd`, que usa o tema cinza e amarelo.
+Ele cria um atalho que abre a ferramenta em **modo aplicativo** do Chrome/Edge.
 
-Para fazer à mão, o atalho é só isto no campo *Destino*:
-
-```
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --app="https://0bibs.github.io/Flex-o-Simples/"
-```
-
-**3. Abrir o arquivo.** Duplo clique no `index.html` — funciona, mas abre como
-uma aba comum do navegador.
-
-> Note que **nenhum dos três gera um `.exe`**. Um executável de verdade exigiria
-> empacotar um navegador junto (Electron, Tauri) e, sem certificado de assinatura
-> digital, o Windows exibiria o aviso do SmartScreen na primeira execução. O modo
-> aplicativo entrega a mesma experiência sem esse atrito.
+**3. Abrir o arquivo.** Duplo clique no `index.html`.
 
 ### Instalar como aplicativo
 
