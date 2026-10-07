@@ -1,0 +1,688 @@
+TAP version 13
+# Subtest: cortante: reproduz os valores da calculadora comercial
+ok 1 - cortante: reproduz os valores da calculadora comercial
+  ---
+  duration_ms: 3.477431
+  type: 'test'
+  ...
+# Subtest: torcao: reproduz a secao vazada equivalente da referencia
+ok 2 - torcao: reproduz a secao vazada equivalente da referencia
+  ---
+  duration_ms: 0.737745
+  type: 'test'
+  ...
+# Subtest: torcao: armaduras transversal e longitudinal da referencia
+ok 3 - torcao: armaduras transversal e longitudinal da referencia
+  ---
+  duration_ms: 0.628114
+  type: 'test'
+  ...
+# Subtest: torcao: TRd3 e TRd4 nao podem ser o TSd disfarcado
+ok 4 - torcao: TRd3 e TRd4 nao podem ser o TSd disfarcado
+  ---
+  duration_ms: 0.496258
+  type: 'test'
+  ...
+# Subtest: torcao: TRd4 fecha exatamente no TSd com a armadura necessaria
+ok 5 - torcao: TRd4 fecha exatamente no TSd com a armadura necessaria
+  ---
+  duration_ms: 0.59012
+  type: 'test'
+  ...
+# Subtest: cortante + torcao: interacao das bielas
+ok 6 - cortante + torcao: interacao das bielas
+  ---
+  duration_ms: 0.337047
+  type: 'test'
+  ...
+# Subtest: modelo II com theta = 45 graus da a mesma biela do modelo I
+ok 7 - modelo II com theta = 45 graus da a mesma biela do modelo I
+  ---
+  duration_ms: 0.457352
+  type: 'test'
+  ...
+# Subtest: modelo II com theta menor exige menos estribo
+ok 8 - modelo II com theta menor exige menos estribo
+  ---
+  duration_ms: 0.15492
+  type: 'test'
+  ...
+# Subtest: ruptura da biela e avisada
+ok 9 - ruptura da biela e avisada
+  ---
+  duration_ms: 0.273319
+  type: 'test'
+  ...
+# Subtest: fywd fica limitado a 435 MPa
+ok 10 - fywd fica limitado a 435 MPa
+  ---
+  duration_ms: 0.482747
+  type: 'test'
+  ...
+# Subtest: espacamento maximo segue o item 18.3.3.2
+ok 11 - espacamento maximo segue o item 18.3.3.2
+  ---
+  duration_ms: 0.202707
+  type: 'test'
+  ...
+# Subtest: o espacamento adotado nunca ultrapassa o maximo
+ok 12 - o espacamento adotado nunca ultrapassa o maximo
+  ---
+  duration_ms: 0.280341
+  type: 'test'
+  ...
+# Subtest: estribo escolhido cobre a demanda de cortante e torcao
+ok 13 - estribo escolhido cobre a demanda de cortante e torcao
+  ---
+  duration_ms: 0.356298
+  type: 'test'
+  ...
+# Subtest: a taxa minima independe do modo e vale 0,2.fctm/fywk
+ok 14 - a taxa minima independe do modo e vale 0,2.fctm/fywk
+  ---
+  duration_ms: 1.261832
+  type: 'test'
+  ...
+# Subtest: ESTILO_DESENHOS reproduz as regras .dg da folha de estilo
+ok 15 - ESTILO_DESENHOS reproduz as regras .dg da folha de estilo
+  ---
+  duration_ms: 2.257786
+  type: 'test'
+  ...
+# Subtest: toda classe usada pelos desenhos tem regra no ESTILO_DESENHOS
+ok 16 - toda classe usada pelos desenhos tem regra no ESTILO_DESENHOS
+  ---
+  duration_ms: 1.562925
+  type: 'test'
+  ...
+# Subtest: o ESTILO_DESENHOS nao depende de variaveis da pagina
+ok 17 - o ESTILO_DESENHOS nao depende de variaveis da pagina
+  ---
+  duration_ms: 0.114234
+  type: 'test'
+  ...
+# Subtest: a folha e um SVG valido nas duas ferramentas e nos dois temas
+ok 18 - a folha e um SVG valido nas duas ferramentas e nos dois temas
+  ---
+  duration_ms: 32.652369
+  type: 'test'
+  ...
+# Subtest: o texto da folha e grande o bastante para ser lido depois de colado
+ok 19 - o texto da folha e grande o bastante para ser lido depois de colado
+  ---
+  duration_ms: 1.583489
+  type: 'test'
+  ...
+# Subtest: a folha traz a identificacao e o titulo
+ok 20 - a folha traz a identificacao e o titulo
+  ---
+  duration_ms: 2.747447
+  type: 'test'
+  ...
+# Subtest: cada ferramenta declara na folha o que ela dimensiona
+ok 21 - cada ferramenta declara na folha o que ela dimensiona
+  ---
+  duration_ms: 2.985537
+  type: 'test'
+  ...
+# Subtest: a frase de cada ferramenta vem do proprio HTML, e nao do codigo
+ok 22 - a frase de cada ferramenta vem do proprio HTML, e nao do codigo
+  ---
+  duration_ms: 0.343793
+  type: 'test'
+  ...
+# Subtest: a folha leva os desenhos e o texto do relatorio, mas nao o rodape da tela
+ok 23 - a folha leva os desenhos e o texto do relatorio, mas nao o rodape da tela
+  ---
+  duration_ms: 1.360999
+  type: 'test'
+  ...
+# Subtest: blocos escondidos pelo modo ficam de fora da folha
+ok 24 - blocos escondidos pelo modo ficam de fora da folha
+  ---
+  duration_ms: 0.878077
+  type: 'test'
+  ...
+# Subtest: o tema muda a identidade visual da folha, nao as cores do desenho
+ok 25 - o tema muda a identidade visual da folha, nao as cores do desenho
+  ---
+  duration_ms: 2.122625
+  type: 'test'
+  ...
+# Subtest: o texto que vem da tela e escapado antes de entrar no SVG
+ok 26 - o texto que vem da tela e escapado antes de entrar no SVG
+  ---
+  duration_ms: 1.182563
+  type: 'test'
+  ...
+# Subtest: o nome do arquivo sai limpo a partir da identificacao
+ok 27 - o nome do arquivo sai limpo a partir da identificacao
+  ---
+  duration_ms: 0.822956
+  type: 'test'
+  ...
+# Subtest: as duas paginas tem os campos de identificacao e os botoes
+ok 28 - as duas paginas tem os campos de identificacao e os botoes
+  ---
+  duration_ms: 0.58738
+  type: 'test'
+  ...
+# Subtest: a exportacao entra no cache offline
+ok 29 - a exportacao entra no cache offline
+  ---
+  duration_ms: 0.115778
+  type: 'test'
+  ...
+# Subtest: a exportacao nao usa nada de fora do navegador
+ok 30 - a exportacao nao usa nada de fora do navegador
+  ---
+  duration_ms: 0.260003
+  type: 'test'
+  ...
+# Subtest: os subscritos do relatorio viram tspan na folha
+ok 31 - os subscritos do relatorio viram tspan na folha
+  ---
+  duration_ms: 1.152384
+  type: 'test'
+  ...
+# Subtest: a comparacao das areas sai destacada na folha
+ok 32 - a comparacao das areas sai destacada na folha
+  ---
+  duration_ms: 0.869047
+  type: 'test'
+  ...
+# Subtest: caso de referencia: reproduz os valores da calculadora comercial
+ok 33 - caso de referencia: reproduz os valores da calculadora comercial
+  ---
+  duration_ms: 3.381072
+  type: 'test'
+  ...
+# Subtest: parametros do concreto do grupo I
+ok 34 - parametros do concreto do grupo I
+  ---
+  duration_ms: 0.184409
+  type: 'test'
+  ...
+# Subtest: parametros do concreto do grupo II (fck > 50)
+ok 35 - parametros do concreto do grupo II (fck > 50)
+  ---
+  duration_ms: 0.116067
+  type: 'test'
+  ...
+# Subtest: rho,min reproduz a Tabela 17.3 da NBR 6118
+ok 36 - rho,min reproduz a Tabela 17.3 da NBR 6118
+  ---
+  duration_ms: 0.259654
+  type: 'test'
+  ...
+# Subtest: ida e volta: dimensionar e depois verificar fecha no mesmo momento
+ok 37 - ida e volta: dimensionar e depois verificar fecha no mesmo momento
+  ---
+  duration_ms: 1.196496
+  type: 'test'
+  ...
+# Subtest: ida e volta tambem no dominio 3
+ok 38 - ida e volta tambem no dominio 3
+  ---
+  duration_ms: 1.542019
+  type: 'test'
+  ...
+# Subtest: acima do limite de ductilidade exige armadura dupla
+ok 39 - acima do limite de ductilidade exige armadura dupla
+  ---
+  duration_ms: 0.54442
+  type: 'test'
+  ...
+# Subtest: sem permitir armadura dupla, resolve com armadura simples e avisa
+ok 40 - sem permitir armadura dupla, resolve com armadura simples e avisa
+  ---
+  duration_ms: 0.422831
+  type: 'test'
+  ...
+# Subtest: secao T com linha neutra dentro da mesa equivale a retangular de largura bf
+ok 41 - secao T com linha neutra dentro da mesa equivale a retangular de largura bf
+  ---
+  duration_ms: 0.579823
+  type: 'test'
+  ...
+# Subtest: secao T com linha neutra na alma usa a decomposicao mesa + alma
+ok 42 - secao T com linha neutra na alma usa a decomposicao mesa + alma
+  ---
+  duration_ms: 0.497879
+  type: 'test'
+  ...
+# Subtest: armadura minima governa em viga pouco solicitada
+ok 43 - armadura minima governa em viga pouco solicitada
+  ---
+  duration_ms: 0.237908
+  type: 'test'
+  ...
+# Subtest: diagrama do aco tipo B desloca o patamar de escoamento
+ok 44 - diagrama do aco tipo B desloca o patamar de escoamento
+  ---
+  duration_ms: 0.117726
+  type: 'test'
+  ...
+# Subtest: area de armadura pelas tres formas de entrada
+ok 45 - area de armadura pelas tres formas de entrada
+  ---
+  duration_ms: 0.08557
+  type: 'test'
+  ...
+# Subtest: conversoes de unidade adotam 1 tf = 10 kN
+ok 46 - conversoes de unidade adotam 1 tf = 10 kN
+  ---
+  duration_ms: 0.047701
+  type: 'test'
+  ...
+# Subtest: momento nulo nao gera armadura nem NaN
+ok 47 - momento nulo nao gera armadura nem NaN
+  ---
+  duration_ms: 0.880672
+  type: 'test'
+  ...
+# Subtest: todo id usado pela interface existe na pagina
+ok 48 - todo id usado pela interface existe na pagina
+  ---
+  duration_ms: 2.758395
+  type: 'test'
+  ...
+# Subtest: os ids de saida do relatorio existem
+ok 49 - os ids de saida do relatorio existem
+  ---
+  duration_ms: 0.311884
+  type: 'test'
+  ...
+# Subtest: os scripts sao carregados na ordem de dependencia
+ok 50 - os scripts sao carregados na ordem de dependencia
+  ---
+  duration_ms: 0.380618
+  type: 'test'
+  ...
+# Subtest: todos os arquivos referenciados pela pagina existem
+ok 51 - todos os arquivos referenciados pela pagina existem
+  ---
+  duration_ms: 0.635897
+  type: 'test'
+  ...
+# Subtest: a pagina nao carrega nada de fora (sem dependencia externa)
+ok 52 - a pagina nao carrega nada de fora (sem dependencia externa)
+  ---
+  duration_ms: 0.287393
+  type: 'test'
+  ...
+# Subtest: os modulos de calculo funcionam fora do navegador
+ok 53 - os modulos de calculo funcionam fora do navegador
+  ---
+  duration_ms: 6.112849
+  type: 'test'
+  ...
+# Subtest: os desenhos produzem SVG valido para os dois tipos de secao
+ok 54 - os desenhos produzem SVG valido para os dois tipos de secao
+  ---
+  duration_ms: 5.5007
+  type: 'test'
+  ...
+# Subtest: a pagina declara o manifesto e a cor do tema
+ok 55 - a pagina declara o manifesto e a cor do tema
+  ---
+  duration_ms: 0.295632
+  type: 'test'
+  ...
+# Subtest: o manifesto tem o que o navegador exige para instalar
+ok 56 - o manifesto tem o que o navegador exige para instalar
+  ---
+  duration_ms: 0.534606
+  type: 'test'
+  ...
+# Subtest: os icones do manifesto existem e tem o tamanho declarado
+ok 57 - os icones do manifesto existem e tem o tamanho declarado
+  ---
+  duration_ms: 1.162968
+  type: 'test'
+  ...
+# Subtest: o service worker guarda em cache tudo que a pagina usa
+ok 58 - o service worker guarda em cache tudo que a pagina usa
+  ---
+  duration_ms: 1.250287
+  type: 'test'
+  ...
+# Subtest: o nome do cache acompanha o conteudo dos arquivos
+not ok 59 - o nome do cache acompanha o conteudo dos arquivos
+  ---
+  duration_ms: 8.379169
+  type: 'test'
+  location: '/mnt/data/revisao_flexao/Flexao-Simples-v1.2.0/test/pagina.test.js:186:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    o cache ficou para tras. Em sw.js troque por:
+      var CACHE = 'flexo-simples-fefcb724dc';
+    + actual - expected
+    
+    + 'flexo-simples-cb21239cf3'
+    - 'flexo-simples-fefcb724dc'
+                     ^
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'flexo-simples-fefcb724dc'
+  actual: 'flexo-simples-cb21239cf3'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/revisao_flexao/Flexao-Simples-v1.2.0/test/pagina.test.js:200:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: o registro do service worker so acontece sob http/https
+ok 60 - o registro do service worker so acontece sob http/https
+  ---
+  duration_ms: 0.131624
+  type: 'test'
+  ...
+# Subtest: a pagina de cisalhamento referencia apenas arquivos existentes
+ok 61 - a pagina de cisalhamento referencia apenas arquivos existentes
+  ---
+  duration_ms: 0.593881
+  type: 'test'
+  ...
+# Subtest: as duas ferramentas se referenciam mutuamente
+ok 62 - as duas ferramentas se referenciam mutuamente
+  ---
+  duration_ms: 0.098066
+  type: 'test'
+  ...
+# Subtest: todo id usado pela interface de cisalhamento existe na pagina
+ok 63 - todo id usado pela interface de cisalhamento existe na pagina
+  ---
+  duration_ms: 0.362763
+  type: 'test'
+  ...
+# Subtest: a pagina de cisalhamento tambem nao carrega nada de fora
+ok 64 - a pagina de cisalhamento tambem nao carrega nada de fora
+  ---
+  duration_ms: 0.188584
+  type: 'test'
+  ...
+# Subtest: o service worker guarda em cache a segunda ferramenta
+ok 65 - o service worker guarda em cache a segunda ferramenta
+  ---
+  duration_ms: 0.497621
+  type: 'test'
+  ...
+# Subtest: os desenhos de cortante e torcao produzem SVG valido
+ok 66 - os desenhos de cortante e torcao produzem SVG valido
+  ---
+  duration_ms: 6.616383
+  type: 'test'
+  ...
+# Subtest: o icone .ico e valido e tem varios tamanhos
+ok 67 - o icone .ico e valido e tem varios tamanhos
+  ---
+  duration_ms: 0.306521
+  type: 'test'
+  ...
+# Subtest: o script do atalho aponta para arquivos que existem
+ok 68 - o script do atalho aponta para arquivos que existem
+  ---
+  duration_ms: 1.284668
+  type: 'test'
+  ...
+# Subtest: o manifesto corporativo e completo e usa a identidade da empresa
+ok 69 - o manifesto corporativo e completo e usa a identidade da empresa
+  ---
+  duration_ms: 1.075446
+  type: 'test'
+  ...
+# Subtest: o tema troca o manifesto e respeita ?tema= na URL
+ok 70 - o tema troca o manifesto e respeita ?tema= na URL
+  ---
+  duration_ms: 0.218988
+  type: 'test'
+  ...
+# Subtest: os dois manifestos e os icones corporativos estao no cache offline
+ok 71 - os dois manifestos e os icones corporativos estao no cache offline
+  ---
+  duration_ms: 0.262629
+  type: 'test'
+  ...
+# Subtest: o .ico corporativo e valido
+ok 72 - o .ico corporativo e valido
+  ---
+  duration_ms: 0.245902
+  type: 'test'
+  ...
+# Subtest: 1.2: unidade usa a convencao legada 10, sem mudar o motor
+ok 73 - 1.2: unidade usa a convencao legada 10, sem mudar o motor
+  ---
+  duration_ms: 1.563026
+  type: 'test'
+  ...
+# Subtest: 1.2: entradas vazias nao sao convertidas silenciosamente em zero
+ok 74 - 1.2: entradas vazias nao sao convertidas silenciosamente em zero
+  ---
+  duration_ms: 0.704556
+  type: 'test'
+  ...
+# Subtest: 1.2: editar h conserva d-prime e deriva d
+ok 75 - 1.2: editar h conserva d-prime e deriva d
+  ---
+  duration_ms: 1.106101
+  type: 'test'
+  ...
+# Subtest: 1.2: editar d-prime conserva h e deriva d
+ok 76 - 1.2: editar d-prime conserva h e deriva d
+  ---
+  duration_ms: 0.262333
+  type: 'test'
+  ...
+# Subtest: 1.2: editar d conserva d-prime e deriva h
+ok 77 - 1.2: editar d conserva d-prime e deriva h
+  ---
+  duration_ms: 0.195186
+  type: 'test'
+  ...
+# Subtest: 1.2: geometria incoerente, infinita ou com afastamento maior que d e recusada
+ok 78 - 1.2: geometria incoerente, infinita ou com afastamento maior que d e recusada
+  ---
+  duration_ms: 0.282982
+  type: 'test'
+  ...
+# Subtest: 1.2: conversao e neutra para resultados numericos e deformacoes
+ok 79 - 1.2: conversao e neutra para resultados numericos e deformacoes
+  ---
+  duration_ms: 3.27605
+  type: 'test'
+  ...
+# Subtest: 1.2: painel tem os sete quadros do esquema, em tres colunas alinhadas
+ok 80 - 1.2: painel tem os sete quadros do esquema, em tres colunas alinhadas
+  ---
+  duration_ms: 48.095273
+  type: 'test'
+  ...
+# Subtest: 1.2: elemento e unico identificador exportado e e escapado
+ok 81 - 1.2: elemento e unico identificador exportado e e escapado
+  ---
+  duration_ms: 31.431832
+  type: 'test'
+  ...
+# Subtest: 1.2: rotulos matematicos tem subscrito real no vetor
+ok 82 - 1.2: rotulos matematicos tem subscrito real no vetor
+  ---
+  duration_ms: 8.824543
+  type: 'test'
+  ...
+# Subtest: 1.2: dados em kN.m aparecem convertidos, com convencao explicita
+ok 83 - 1.2: dados em kN.m aparecem convertidos, com convencao explicita
+  ---
+  duration_ms: 3.195242
+  type: 'test'
+  ...
+# Subtest: 1.2: secao T, laje, dupla, minima e momento nulo nao geram valores invalidos no vetor
+ok 84 - 1.2: secao T, laje, dupla, minima e momento nulo nao geram valores invalidos no vetor
+  ---
+  duration_ms: 16.67662
+  type: 'test'
+  ...
+# Subtest: 1.2: diagramas e calculo nao fabricam barras no modo area equivalente
+ok 85 - 1.2: diagramas e calculo nao fabricam barras no modo area equivalente
+  ---
+  duration_ms: 1.259739
+  type: 'test'
+  ...
+# Subtest: 1.2: avisos do motor permanecem na exportacao e nao viram aprovacao global
+ok 86 - 1.2: avisos do motor permanecem na exportacao e nao viram aprovacao global
+  ---
+  duration_ms: 1.841968
+  type: 'test'
+  ...
+# Subtest: 1.2: modo inverso e rotulado como capacidade, sem minimo ficticiamente adotado
+ok 87 - 1.2: modo inverso e rotulado como capacidade, sem minimo ficticiamente adotado
+  ---
+  duration_ms: 1.967722
+  type: 'test'
+  ...
+# Subtest: 1.2: identificador extenso aumenta a altura, sem truncar dados
+ok 88 - 1.2: identificador extenso aumenta a altura, sem truncar dados
+  ---
+  duration_ms: 4.118128
+  type: 'test'
+  ...
+# Subtest: 1.2: HTML mantem a armadura minima e oferece h/d/d-prime e seletor de unidades
+ok 89 - 1.2: HTML mantem a armadura minima e oferece h/d/d-prime e seletor de unidades
+  ---
+  duration_ms: 0.813133
+  type: 'test'
+  ...
+# Subtest: revisao visual: documento coloca dados e modelo antes dos resultados
+ok 90 - revisao visual: documento coloca dados e modelo antes dos resultados
+  ---
+  duration_ms: 1.768372
+  type: 'test'
+  ...
+# Subtest: revisao visual: geometria preserva proporcao e nao fabrica barras no dimensionamento
+ok 91 - revisao visual: geometria preserva proporcao e nao fabrica barras no dimensionamento
+  ---
+  duration_ms: 0.511192
+  type: 'test'
+  ...
+# Subtest: revisao visual: resultantes nulas sem seta e armadura superior respeita sinal
+ok 92 - revisao visual: resultantes nulas sem seta e armadura superior respeita sinal
+  ---
+  duration_ms: 1.318175
+  type: 'test'
+  ...
+# Subtest: revisao visual: invalidacao nao conserva resultados ou diagramas
+ok 93 - revisao visual: invalidacao nao conserva resultados ou diagramas
+  ---
+  duration_ms: 0.493475
+  type: 'test'
+  ...
+# Subtest: 1.1: configura a largura nominal e o PNG sem alterar o viewBox
+ok 94 - 1.1: configura a largura nominal e o PNG sem alterar o viewBox
+  ---
+  duration_ms: 1.205459
+  type: 'test'
+  ...
+# Subtest: 1.1: memorial coloca dados, modelo, resultados e armadura nessa ordem
+ok 95 - 1.1: memorial coloca dados, modelo, resultados e armadura nessa ordem
+  ---
+  duration_ms: 1.679749
+  type: 'test'
+  ...
+# Subtest: 1.1: opcao tela preserva a ordem anterior
+ok 96 - 1.1: opcao tela preserva a ordem anterior
+  ---
+  duration_ms: 0.212872
+  type: 'test'
+  ...
+# Subtest: 1.1: grupos desconhecidos, avisos e conteudo sem titulo nao desaparecem
+ok 97 - 1.1: grupos desconhecidos, avisos e conteudo sem titulo nao desaparecem
+  ---
+  duration_ms: 0.243049
+  type: 'test'
+  ...
+# Subtest: 1.1: cortante e torcao conservam grupos e colocam dados antes das figuras
+ok 98 - 1.1: cortante e torcao conservam grupos e colocam dados antes das figuras
+  ---
+  duration_ms: 0.303007
+  type: 'test'
+  ...
+# Subtest: 1.1: quebra textos longos e identificadores sem espacos
+ok 99 - 1.1: quebra textos longos e identificadores sem espacos
+  ---
+  duration_ms: 1.848841
+  type: 'test'
+  ...
+# Subtest: 1.1: quebra rich text preserva subscritos e destaques
+ok 100 - 1.1: quebra rich text preserva subscritos e destaques
+  ---
+  duration_ms: 0.521983
+  type: 'test'
+  ...
+# Subtest: 1.1: marcadores nao se repetem a cada palavra durante a quebra
+ok 101 - 1.1: marcadores nao se repetem a cada palavra durante a quebra
+  ---
+  duration_ms: 0.238761
+  type: 'test'
+  ...
+# Subtest: 1.1: CRC32 confere com o vetor padrao
+ok 102 - 1.1: CRC32 confere com o vetor padrao
+  ---
+  duration_ms: 0.515775
+  type: 'test'
+  ...
+# Subtest: 1.1: pHYs define 2000 px em 165 mm e conserva IDAT
+ok 103 - 1.1: pHYs define 2000 px em 165 mm e conserva IDAT
+  ---
+  duration_ms: 3.106988
+  type: 'test'
+  ...
+# Subtest: 1.1: atualizar pHYs e idempotente e nao duplica o chunk
+ok 104 - 1.1: atualizar pHYs e idempotente e nao duplica o chunk
+  ---
+  duration_ms: 0.855017
+  type: 'test'
+  ...
+# Subtest: 1.1: PNG aceita Uint8Array com offset de buffer
+ok 105 - 1.1: PNG aceita Uint8Array com offset de buffer
+  ---
+  duration_ms: 0.483646
+  type: 'test'
+  ...
+# Subtest: 1.1: PNG recusa assinatura, truncamento e dimensoes inconsistentes
+ok 106 - 1.1: PNG recusa assinatura, truncamento e dimensoes inconsistentes
+  ---
+  duration_ms: 3.600415
+  type: 'test'
+  ...
+# Subtest: 1.1: exportacao direta recusa relatorio invalidado
+ok 107 - 1.1: exportacao direta recusa relatorio invalidado
+  ---
+  duration_ms: 0.858033
+  type: 'test'
+  ...
+# Subtest: 1.1: rasterizacao recusa dimensoes antes de tentar criar imagem
+ok 108 - 1.1: rasterizacao recusa dimensoes antes de tentar criar imagem
+  ---
+  duration_ms: 0.703201
+  type: 'test'
+  ...
+# Subtest: 1.1: formulas dos tres modulos sao identicas ao commit base
+ok 109 - 1.1: formulas dos tres modulos sao identicas ao commit base
+  ---
+  duration_ms: 0.866979
+  type: 'test'
+  ...
+1..109
+# tests 109
+# suites 0
+# pass 108
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 306.638737

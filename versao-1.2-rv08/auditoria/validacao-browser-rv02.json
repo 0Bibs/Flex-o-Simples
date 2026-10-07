@@ -1,0 +1,302 @@
+{
+  "checks": [
+    "Inicialização com os recursos reais do pacote, em DOM local",
+    "Ordenação na tela para o exemplo enviado",
+    "Prévia física abre e fecha pelo teclado",
+    "Duas composições documentais disponíveis sem alterar o cálculo",
+    "Download PNG real: 2000 px e metadados físicos de 165 mm",
+    "Download SVG vetorial real com largura física",
+    "Troca de unidades sem alteração numérica do estado",
+    "Mínima governa e o estado dos diagramas é explicitamente identificado",
+    "Não atendimento visível no painel e no relatório completo, com demanda independente",
+    "Modo capacidade não inventa aprovação ou demanda independente",
+    "Entradas inválidas limpam estado e bloqueiam prévia/exportação, inclusive após troca de unidade",
+    "Recuperação após correção das entradas",
+    "38 composições renderizadas com os estados do motor, sem NaN/Infinity/undefined",
+    "Tela a 1000 px mantém o conteúdo com rolagem, sem esconder resultados",
+    "Cortante/torção: três modos e montagem de exportação preservados",
+    "Nenhuma exceção JavaScript nos cenários exercitados"
+  ],
+  "javascript_errors": [],
+  "layout_issues": [],
+  "fixtures": [
+    {
+      "case": "padrao_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "padrao_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "laje_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "laje_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "alta_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1075
+    },
+    {
+      "case": "alta_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 994
+    },
+    {
+      "case": "larga_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1075
+    },
+    {
+      "case": "larga_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 994
+    },
+    {
+      "case": "secao_T_mesa_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1098
+    },
+    {
+      "case": "secao_T_mesa_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "secao_T_alma_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1180
+    },
+    {
+      "case": "secao_T_alma_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 1004
+    },
+    {
+      "case": "dupla_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "dupla_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "minima_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1075
+    },
+    {
+      "case": "minima_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 994
+    },
+    {
+      "case": "minima_desligada_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "minima_desligada_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "nulo_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1043
+    },
+    {
+      "case": "nulo_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 999
+    },
+    {
+      "case": "C90_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "C90_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "aco_B_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "aco_B_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "capacidade_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1068
+    },
+    {
+      "case": "capacidade_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 999
+    },
+    {
+      "case": "aco_superior_tracionado_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1068
+    },
+    {
+      "case": "aco_superior_tracionado_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 999
+    },
+    {
+      "case": "verificacao_atende_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1165
+    },
+    {
+      "case": "verificacao_atende_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 999
+    },
+    {
+      "case": "verificacao_nao_atende_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1165
+    },
+    {
+      "case": "verificacao_nao_atende_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 999
+    },
+    {
+      "case": "titulo_longo_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1095
+    },
+    {
+      "case": "titulo_longo_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 1011
+    },
+    {
+      "case": "titulo_html_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1006
+    },
+    {
+      "case": "titulo_html_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 969
+    },
+    {
+      "case": "area_elevada_doc",
+      "out": [],
+      "pairs": [],
+      "width": 1000,
+      "height": 1133
+    },
+    {
+      "case": "area_elevada_tela",
+      "out": [],
+      "pairs": [],
+      "width": 1100,
+      "height": 1048
+    }
+  ],
+  "png": {
+    "width": 2000,
+    "height": 2012,
+    "pHYs": [
+      [
+        12121,
+        12121,
+        1
+      ]
+    ]
+  },
+  "method": "Arquivos reais em DOM local via Playwright/Chromium. Não testa file://, HTTP, PWA, Word ou área de transferência real."
+}

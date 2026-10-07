@@ -1,0 +1,30 @@
+FLEXÃO SIMPLES 1.2.0 — RV08 — 02/10/2026
+
+Resumo horizontal: Flexão e Cortante/Torção passaram a ter três painéis (seção transversal, resultados e diagrama: MRd × As na flexão; armadura por ramo × espaçamento no cortante/torção) e tabela de esforços com D/C e FS; os diagramas de equilíbrio e de domínios ficam em cartões à parte na tela.
+Referência de proporção: área marcada em vermelho pelo usuário, aproximadamente 2:1.
+No caso BLOCO SP-01, PNG com 2.000 × 986 px e largura nominal de 165 mm.
+
+O resumo concentra identificação, norma, materiais, geometria, esforços, armaduras,
+limites, capacidade, índices de utilização e verificações, solução e conclusão.
+Diagramas e parâmetros de auditoria continuam no relatório completo.
+As saídas Copiar resumo, PNG, SVG e prévia utilizam a mesma composição.
+
+D/C = demanda/capacidade; FS = capacidade/demanda.
+Na flexão, D/C = MSd/MRd e FS = MRd/MSd da armadura efetivamente adotada.
+No dimensionamento, essa armadura é reverificada, inclusive quando a mínima governa.
+Os índices não substituem os coeficientes normativos nem as outras verificações.
+Uma resistência suficiente não aprova automaticamente mínimos, máximos ou ductilidade.
+Sem demanda independente não são fabricados D/C ou FS. Com demanda nula, FS é não
+aplicável. Os casos pendentes/inconclusivos e o não atendimento permanecem explícitos.
+Em Cortante/Torção, os índices são mostrados por critério da combinação informada.
+
+Exemplo conferido: BLOCO SP-01, bw = 100 cm, h = 20 cm, d = 15 cm, d′ = 5 cm,
+fck = 30 MPa, fyk = 500 MPa, γc = 1,40, γs = 1,15, γf = 1,40, 10 barras Ø8 mm,
+MSd = 2.650,00 kgf·m. MRd = 3.147,07 kgf·m; D/C = 0,84; FS = 1,19.
+
+Validação: 156 testes automatizados aprovados, incluindo preservação dos motores.
+Conferência visual no tamanho de uso e exportações reais de ambas as abas no Edge.
+Testes de resumo: caso de referência, dimensão por mínima, capacidade sem demanda,
+demanda nula, seção T, armadura nula, insuficiência, identificação extensa e pendências.
+Sem sobreposição de textos ou valores fora da folha nos casos conferidos.
+Precisão interna mantida; apresentação com até duas casas. 10 N = 1 kgf.

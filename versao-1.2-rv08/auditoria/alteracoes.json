@@ -1,0 +1,33 @@
+{
+  "origem": "Flexao-Simples-v1.2.0.zip",
+  "revisao": "RV02",
+  "alterados": [
+    "README.md",
+    "css/painel-flexao.css",
+    "index.html",
+    "js/app.js",
+    "js/painel-flexao.js",
+    "sw.js"
+  ],
+  "novos": [
+    "auditoria/AUDITORIA-RV02.md",
+    "auditoria/contraprova_modo_original.json",
+    "auditoria/evidencias.json",
+    "auditoria/testes-browser-rv02.txt",
+    "auditoria/testes-node-original.txt",
+    "auditoria/testes-node-rv02.txt",
+    "auditoria/validacao-browser-rv02.json",
+    "exemplos-rv02/Amostra_Word_Flexao_RV02.docx",
+    "exemplos-rv02/painel-compacto.png",
+    "exemplos-rv02/painel-compacto.svg",
+    "scripts/testar-rv02.py",
+    "test/revisao-visual-rv02.test.js"
+  ],
+  "word_amostra": {
+    "paginas_renderizadas": 1,
+    "largura_imagem_mm": 165,
+    "motor_renderizacao": "LibreOffice via render_docx.py",
+    "inspecao_visual": "realizada",
+    "word_nativo_testado": false
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "modo": "AS_MSD",
+  "MSd": 20,
+  "MRd": 3.8092590533377813,
+  "flexao": "NÃO ATENDE",
+  "verificacoes": [
+    {
+      "id": "flexao",
+      "titulo": "Resistência à flexão",
+      "demanda": 20,
+      "capacidade": 3.8092590533377813,
+      "unidade": "momento",
+      "razao": 5.250364892478349,
+      "criterio": "MSd ≤ MRd",
+      "situacao": "NÃO ATENDE"
+    },
+    {
+      "id": "minima",
+      "titulo": "Armadura mínima",
+      "demanda": 1.47,
+      "capacidade": 2,
+      "unidade": "cm²",
+      "razao": 0.735,
+      "criterio": "As,adotada ≥ As,mín",
+      "situacao": "ATENDE"
+    },
+    {
+      "id": "maxima",
+      "titulo": "Armadura máxima",
+      "demanda": 2,
+      "capacidade": 39.2,
+      "unidade": "cm²",
+      "razao": 0.0510204081632653,
+      "criterio": "As + As′ ≤ As,máx",
+      "situacao": "ATENDE"
+    },
+    {
+      "id": "ductilidade",
+      "titulo": "Ductilidade",
+      "demanda": 0.06630671592308421,
+      "capacidade": 0.45,
+      "unidade": "",
+      "razao": 0.1473482576068538,
+      "criterio": "βx ≤ βx,lim",
+      "situacao": "ATENDE"
+    }
+  ],
+  "avisos": [],
+  "orig_exibe_nao_atende": false,
+  "texto_original": "text{font-family:Segoe UI,Arial,sans-serif;font-variant-numeric:tabular-nums}ELEMENTO — não informadoMomento → armadura · NBR 6118:2023 · Flexão simplesSeção transversalhdd′bwbw = 20,0 cmh = 49,0 cmd = 45,0 cmd′ = 4,0 cmh = d + d′; afastamento efetivo simétrico.Distribuição ilustrativa — não constituidetalhamento.Armaduras / limitesAs,calc2,00 cm²As,mín1,47 cm²As,adotada2,00 cm²A′s0,00 cm²ρmín0,150 %Ac980,0 cm²As,máx39,20 cm²Md,mín2,41 tf·mGoverna: cálculo.As,adotada &gt; As,mín &lt; As,calcMateriais / critériosfck = 30 MPafyk = 500 MPaTipo = Afctk,sup = 3,77 MPaγc = 1,40γs = 1,15λ = 0,800αc = 0,850Carregamento / modo de cálculoMsk14,29 tf·mγf1,40MSd20,00 tf·mModelo · domínios de deformaçãoAlongamento (−)Encurtamento (+)123454aABC−10‰03,50‰εcεsεs = 10,00 ‰εc = 0,71 ‰εyd = 2,07 ‰εc2 = 2,00 ‰Polos A: aço; B: concreto na face; C:compressão. Eixo vertical: deformação nula.Modelo · equilíbrio da seçãoDeformaçõesTensões e resultantesLNRcRt,eqx = 2,98 cmy = λx = 2,39 cmRc = 86,96 kNR′s = 0,00 kNRt,eq = Rc + R′s = 86,96 kN. Setasesquemáticas; soma por identidade.Resultados da seçãoAs,adotada · armadura2,00 cm²MSd20,00 tf·mDomínio2βx = x/d = 0,066βx,lim = 0,450Conclusão: armadura adotada conforme os critérios indicados; conferir detalhamento.Flexão Simples 1.2.0 · NBR 6118:2023 · Face comprimida no topo. Convenção legada: 10 N = 1kgf; 1 tf·m = 10 kN·m."
+}

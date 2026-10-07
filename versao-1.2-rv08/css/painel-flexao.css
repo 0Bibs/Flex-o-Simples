@@ -1,0 +1,161 @@
+/* ---------------------------------------------------------------------------
+   Flexão Simples — aba Flexão (RV08 · interface renovada)
+   Depende dos tokens de css/styles.css. O painel SVG usa cores técnicas
+   próprias; aqui ficam só a moldura, a barra de ferramentas e os indicadores.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------- painel de dados */
+.export-botoes #btCopiarImagem { order: -1; grid-column: 1 / -1; min-height: 38px; font-size: 13.5px; }
+#exportOrdem { width: 100%; }
+
+/* ---------------------------------------------------- erros de entrada */
+.faixa-resultado { margin: 0 0 14px; }
+.faixa-resultado:empty { display: none; }
+.faixa-resultado .aviso { margin: 0; padding: 12px 16px; font-weight: 600; }
+.faixa-resultado .aviso ul { margin: 6px 0 0; padding-left: 20px; font-weight: 500; }
+
+/* ---------------------------------------------------- resumo (SVG) */
+.painel-svg {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+.painel-svg > svg { width: 100%; min-width: 680px; height: auto; display: block; }
+
+.detalhes-memorial {
+  margin: 14px 0 0;
+  background: var(--surf);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+.detalhes-memorial > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--txt-2);
+  background: var(--surf-2);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.detalhes-memorial > summary::-webkit-details-marker { display: none; }
+.detalhes-memorial > summary::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-right: 2px solid var(--txt-3);
+  border-bottom: 2px solid var(--txt-3);
+  transform: rotate(-45deg);
+  transition: transform .15s;
+}
+.detalhes-memorial[open] > summary::before { transform: rotate(45deg); }
+.detalhes-memorial[open] > summary { border-bottom: 1px solid var(--borda); }
+.detalhes-memorial > summary:hover { color: var(--txt); }
+#relatorioTexto { padding: 8px 18px 16px; }
+#relatorioTexto h2 {
+  margin: 20px 0 6px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--acento);
+  font-family: var(--fonte-titulo);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--txt);
+}
+#relatorioTexto h3 {
+  margin: 14px 0 3px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--txt-3);
+}
+#relatorioTexto .figura { max-width: 900px; }
+#relatorioTexto .bloco p { font-size: 13.5px; }
+.pagina-flexao .rodape { max-width: 1200px; }
+
+/* ---------------------------------------------------- gráficos técnicos */
+.graficos-tecnicos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 14px 0 0;
+}
+.cartao-grafico {
+  min-width: 0;
+  padding: 0 0 8px;
+  background: var(--surf);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+.cartao-grafico > h2 {
+  margin: 0;
+  padding: 10px 16px;
+  background: var(--surf-2);
+  border-bottom: 1px solid var(--borda);
+  font-family: var(--fonte-titulo);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .55px;
+  text-transform: uppercase;
+  color: var(--txt-2);
+}
+.cartao-grafico .figura { margin: 8px 10px 0; }
+.cartao-grafico .figura svg { max-width: 100%; }
+
+/* ---------------------------------------------------- prévia 165 mm */
+#previaDocumento {
+  padding: 16px 18px 18px;
+  border: 0;
+  border-radius: var(--raio);
+  max-height: 90vh;
+  max-width: 94vw;
+  background: var(--surf);
+  color: var(--txt);
+  box-shadow: var(--sombra-forte);
+}
+#previaDocumento::backdrop { background: rgb(10 24 40 / 50%); }
+.previa-barra { display: flex; gap: 24px; align-items: center; justify-content: space-between; font-size: 14px; }
+.previa-barra button {
+  min-height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-s);
+  background: var(--surf-2);
+  color: var(--txt);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.previa-barra button:hover { background: var(--acento-suave); border-color: var(--realce); }
+#metricasPrevia { max-width: 165mm; margin: 8px 0 12px; font-size: 12.5px; line-height: 1.5; color: var(--txt-2); }
+#folhaPrevia { width: 165mm; background: #fff; border: 1px solid var(--borda); }
+#folhaPrevia svg { display: block; width: 165mm; height: auto; }
+
+/* ---------------------------------------------------- telas estreitas */
+@media (max-width: 1100px) { .graficos-tecnicos { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .barra-ferramentas { padding: 8px 12px; }
+  .barra-ferramentas kbd, .barra-ferramentas .rotulo-barra { display: none; }
+  #folhaPrevia, #folhaPrevia svg { width: 100%; }
+}
+
+/* ---------------------------------------------------- impressão */
+@media print {
+  .titulo-janela, .barra-ferramentas, .pagina-flexao .painel, .detalhes-memorial,
+  .pagina-flexao .rodape, .faixa-resultado, .barra-status, .graficos-tecnicos, #previaDocumento, .export-aviso { display: none !important; }
+  html, body.pagina-flexao { height: auto; background: #fff; }
+  .pagina-flexao .janela, .pagina-flexao .conteudo { display: block; height: auto; border: 0; background: #fff; }
+  .pagina-flexao .relatorio { overflow: visible; padding: 0; background: #fff; }
+  .painel-svg { width: 165mm; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+  .painel-svg > svg { min-width: 0; }
+}

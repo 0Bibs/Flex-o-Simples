@@ -1,0 +1,18 @@
+PASS: Inicialização com os recursos reais do pacote, em DOM local
+PASS: Ordenação na tela para o exemplo enviado
+PASS: Prévia física abre e fecha pelo teclado
+PASS: Duas composições documentais disponíveis sem alterar o cálculo
+PASS: Download PNG real: 2000 px e metadados físicos de 165 mm
+PASS: Download SVG vetorial real com largura física
+PASS: Troca de unidades sem alteração numérica do estado
+PASS: Mínima governa e o estado dos diagramas é explicitamente identificado
+PASS: Não atendimento visível no painel e no relatório completo, com demanda independente
+PASS: Modo capacidade não inventa aprovação ou demanda independente
+PASS: Entradas inválidas limpam estado e bloqueiam prévia/exportação, inclusive após troca de unidade
+PASS: Recuperação após correção das entradas
+PASS: 38 composições renderizadas com os estados do motor, sem NaN/Infinity/undefined
+PASS: Tela a 1000 px mantém o conteúdo com rolagem, sem esconder resultados
+PASS: Cortante/torção: três modos e montagem de exportação preservados
+PASS: Nenhuma exceção JavaScript nos cenários exercitados
+Layout issues: 0
+[]

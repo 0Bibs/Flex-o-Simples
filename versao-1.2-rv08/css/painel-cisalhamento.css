@@ -1,0 +1,68 @@
+/* ---------------------------------------------------------------------------
+   Flexão Simples — aba Cortante/Torção (RV08 · interface renovada)
+   Usa os tokens de css/styles.css.
+   --------------------------------------------------------------------------- */
+.pagina-cisalhamento .painel .botao { white-space: normal; }
+.pagina-cisalhamento .painel .botao:not(.botao-mini) + .botao:not(.botao-mini) { margin-top: 8px; }
+
+/* situação geral, logo abaixo da operação */
+#resumoAtendimento {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  height: auto;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--borda-forte);
+  border-radius: var(--raio-s);
+  background: var(--surf);
+  color: var(--txt-2);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  line-height: 1.3;
+}
+#resumoAtendimento:empty { display: none; }
+#resumoAtendimento::before {
+  flex: 0 0 22px;
+  display: grid; place-items: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--txt-3);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  content: "i";
+}
+#resumoAtendimento[data-situacao="ATENDE"] { background: var(--ok-bg); border-color: var(--ok-borda); color: var(--ok); }
+#resumoAtendimento[data-situacao="ATENDE"]::before { content: "✓"; background: var(--ok); }
+#resumoAtendimento[data-situacao="NÃO ATENDE"] { background: var(--bad-bg); border-color: var(--bad-borda); color: var(--bad); }
+#resumoAtendimento[data-situacao="NÃO ATENDE"]::before { content: "✕"; background: var(--bad); }
+#resumoAtendimento[data-situacao="PENDENTE"] { background: var(--warn-bg); border-color: var(--warn-borda); color: var(--warn); }
+#resumoAtendimento[data-situacao="PENDENTE"]::before { content: "!"; background: var(--warn); }
+
+.pagina-cisalhamento .export-botoes #btCopiarImagem { order: -1; grid-column: 1 / -1; min-height: 38px; font-size: 13.5px; }
+.pagina-cisalhamento .export-botoes #btRelatorioCompleto { grid-column: 1 / -1; }
+
+#painelCisalhamento {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+#painelCisalhamento > svg { width: 100%; min-width: 680px; height: auto; display: block; }
+#painelCisalhamento:has(> .aviso-erro) { background: transparent; border: 0; box-shadow: none; overflow: visible; }
+#painelCisalhamento > .aviso-erro { margin: 0; padding: 12px 16px; font-weight: 600; }
+#painelCisalhamento > .aviso-erro ul { margin: 6px 0 0; padding-left: 20px; font-weight: 500; }
+
+@media print {
+  .titulo-janela, .barra-ferramentas, .barra-status, .pagina-cisalhamento .painel, .export-aviso { display: none !important; }
+  html, body.pagina-cisalhamento { height: auto; background: #fff; }
+  .pagina-cisalhamento .janela, .pagina-cisalhamento .conteudo { display: block; height: auto; background: #fff; }
+  .pagina-cisalhamento .relatorio { overflow: visible; padding: 0; background: #fff; }
+  #painelCisalhamento { width: 165mm; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+  #painelCisalhamento > svg { min-width: 0; }
+}

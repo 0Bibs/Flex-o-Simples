@@ -1,0 +1,129 @@
+{
+  "arquivo_original_sha256": "a88bf4183dc62908e5b438c85e36eac8bbffb099a8dae378e715011a07a17ced",
+  "hashes_motores": [
+    {
+      "arquivo": "js/norma.js",
+      "original": "c7d31792a6d8e99cd146e8bfe8b38e8a96b21bc99c65977bedfb661197b15f45",
+      "rv02": "c7d31792a6d8e99cd146e8bfe8b38e8a96b21bc99c65977bedfb661197b15f45",
+      "identico": true
+    },
+    {
+      "arquivo": "js/flexao.js",
+      "original": "9121c3540ebf36f96386925611b3244013fd7ce42d0188e3c8489ef7880a1a1b",
+      "rv02": "9121c3540ebf36f96386925611b3244013fd7ce42d0188e3c8489ef7880a1a1b",
+      "identico": true
+    },
+    {
+      "arquivo": "js/cisalhamento.js",
+      "original": "28f257be04fc2fb74277236668265476dbad994b5f117cc7371c3229b11e89f2",
+      "rv02": "28f257be04fc2fb74277236668265476dbad994b5f117cc7371c3229b11e89f2",
+      "identico": true
+    },
+    {
+      "arquivo": "js/verificacao-flexao.js",
+      "original": "4997140d77cb65dbe3609a8074a2a49fe74a7ccb94fff2ecdb66ee056e2aceda",
+      "rv02": "4997140d77cb65dbe3609a8074a2a49fe74a7ccb94fff2ecdb66ee056e2aceda",
+      "identico": true
+    },
+    {
+      "arquivo": "js/entrada-flexao.js",
+      "original": "2a152e56319d30433dee78bb4f8795c1659742028bc10255b61940424b438f62",
+      "rv02": "2a152e56319d30433dee78bb4f8795c1659742028bc10255b61940424b438f62",
+      "identico": true
+    }
+  ],
+  "localizacoes_fonte_original": {
+    "js/painel-flexao.js": {
+      "function compareAreas": [
+        142
+      ],
+      "function montar": [
+        227
+      ],
+      "var doc=": [
+        229
+      ],
+      "var secondRow": [
+        239
+      ],
+      "function equilibrium": [
+        200
+      ],
+      "function response": [
+        159
+      ],
+      "function domains": [
+        165
+      ],
+      "function summary": [
+        220
+      ],
+      "function reinforcement": [
+        155
+      ]
+    },
+    "js/app.js": {
+      "function comparacao": [
+        156
+      ],
+      "function verificar()": [
+        135
+      ],
+      "function render": [
+        187
+      ]
+    },
+    "js/verificacao-flexao.js": {
+      "function verificar(e)": [
+        5
+      ],
+      "r.verificacoes=": [
+        20
+      ]
+    },
+    "css/painel-flexao.css": {
+      ".painel-svg{min-width:1100px": [
+        47,
+        51
+      ]
+    },
+    "sw.js": {
+      "var CACHE": [
+        22
+      ]
+    }
+  },
+  "metricas": {
+    "original": {
+      "svg": [
+        1000,
+        1409
+      ],
+      "png": [
+        2000,
+        2818
+      ],
+      "fisico_mm": [
+        165,
+        232.485
+      ]
+    },
+    "rv02": {
+      "svg": [
+        1000,
+        1006
+      ],
+      "png": [
+        2000,
+        2012
+      ],
+      "fisico_mm": [
+        165,
+        165.99
+      ]
+    },
+    "reducao_altura_percentual": 28.60184528034067,
+    "espaco_liberado_mm": 66.495,
+    "corpo_pt_original_e_rv02": 8.652755905511812
+  }
+}

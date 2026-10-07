@@ -1,0 +1,67 @@
+{
+  "name": "flexao-simples",
+  "productName": "Flexão Simples",
+  "version": "1.2.8",
+  "description": "Flexão Simples 1.2.0 RV08 — concreto armado segundo a ABNT NBR 6118",
+  "author": "Flexão Simples",
+  "license": "MIT",
+  "main": "desktop/main.js",
+  "scripts": {
+    "test": "node --test",
+    "app": "electron .",
+    "exe": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "br.padrao.flexaosimples",
+    "productName": "Flexão Simples",
+    "executableName": "Flexao Simples",
+    "files": [
+      "index.html",
+      "cisalhamento/**",
+      "css/**",
+      "js/**",
+      "icons/**",
+      "desktop/**",
+      "LICENSE"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "flexo",
+        "name": "Projeto Flexão Simples",
+        "icon": "icons/flexo-simples.ico"
+      }
+    ],
+    "win": {
+      "icon": "icons/flexo-simples.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Flexão Simples",
+      "include": "build/installer.nsh",
+      "artifactName": "Flexao-Simples-1.2.0-RV08-Instalador.exe"
+    },
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "publish": null
+  }
+}
